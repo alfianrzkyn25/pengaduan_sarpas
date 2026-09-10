@@ -1,1 +1,65 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detail Aspirasi</title><link rel="stylesheet" href="../assets/admin.css"></head><body><input type="checkbox" id="menuToggle" class="menu-toggle"><aside class="sidebar" id="sidebar"><div class="sidebar-header">Pengaduan Sarpras</div><ul><li><a href="../controller/c_dashboard.php" class="">Dashboard</a></li><li><a href="../controller/c_aspirasi.php" class="active">Data Aspirasi</a></li><li><a href="../controller/c_tambah_aspirasi.php" class="">form aspirasi</a></li><li><a href="../controller/c_histori.php" class="">Histori Laporan</a></li><li><a href="../controller/c_kategori.php" class="">Kategori Sarpras</a></li><li><a href="../logout.php">Keluar</a></li></ul><div class="admin-user"><strong><?=e($user["nama"]??"Admin")?></strong>Administrator</div></aside><label for="menuToggle" class="sidebar-overlay"></label><div class="main-content"><header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label><h1>Detail Aspirasi</h1></header><main class="content-area"><?php if($error):?><div class="alert error"><?=e($error)?></div><?php endif;?><?php if($ok):?><div class="alert success"><?=e($ok)?></div><?php endif;?><?php if(!$a):?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="../controller/c_aspirasi.php">Kembali</a><?php else:?><div class="heading"><div><p class="eyebrow">Aspirasi #<?=$a['id_aspirasi']?></p><h1><?=e($a['nama_kategori'])?></h1><p class="muted"><?=e($a['nama_siswa'])?> · <?=e($a['nis'])?></p></div><span class="badge <?=strtolower($a['status'])?>"><?=e($a['status'])?></span></div><div class="detail"><section class="panel"><h2>Detail Laporan</h2><p><b>Pelapor</b><?=e($a['nama_siswa'])?> · <?=e($a['kelas'])?></p><p><b>Lokasi</b><?=e($a['lokasi'])?></p><p><b>Keterangan</b><?=e($a['keterangan'])?></p><p><b>Feedback</b><?=e($a['feedback']?:'-')?></p><p><b>Dibuat</b><?=e($a['tanggal'])?></p><?php if($lampiran):?><div style="margin-top:10px"><b>Foto Lampiran</b><div class="lampiran-grid"><?php foreach($lampiran as $lf):?><a href="../<?=e($lf['url_file'])?>" target="_blank"><img src="../<?=e($lf['url_file'])?>" alt="<?=e($lf['nama_file'])?>"></a><?php endforeach;?></div></div><?php endif;?></section><section class="panel"><h2>Perbarui Status</h2><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status<select name="status"><option <?=$a['status']==='Menunggu'?'selected':''?>>Menunggu</option><option <?=$a['status']==='Proses'?'selected':''?>>Proses</option><option <?=$a['status']==='Selesai'?'selected':''?>>Selesai</option></select></label><label>Feedback<textarea name="feedback" maxlength="255"><?=e($a['feedback']??'')?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form></section></div><section class="panel"><h2>Riwayat</h2><div class="timeline"><?php foreach($hist as $h):?><div class="timeline-item"><b><?=e($h['status_baru'])?></b><small><?=e($h['waktu_ubah'])?> · <?=e($h['diubah_oleh'])?></small><div><?=e($h['catatan']?:'-')?></div></div><?php endforeach;?></div></section><a class="btn secondary" href="../controller/c_aspirasi.php">← Kembali</a><?php endif;?></main></div></body></html>
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Detail Aspirasi</title>
+    <link rel="stylesheet" href="../assets/admin.css">
+</head>
+
+<body><input type="checkbox" id="menuToggle" class="menu-toggle">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">Pengaduan Sarpras</div>
+        <ul>
+            <li><a href="../controller/c_dashboard.php" class="">Dashboard</a></li>
+            <li><a href="../controller/c_aspirasi.php" class="active">Data Aspirasi</a></li>
+            <li><a href="../controller/c_tambah_aspirasi.php" class="">form aspirasi</a></li>
+            <li><a href="../controller/c_histori.php" class="">Histori Laporan</a></li>
+            <li><a href="../controller/c_kategori.php" class="">Kategori Sarpras</a></li>
+            <li><a href="../logout.php">Keluar</a></li>
+        </ul>
+        <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
+    </aside><label for="menuToggle" class="sidebar-overlay"></label>
+    <div class="main-content">
+        <header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label>
+            <h1>Detail Aspirasi</h1>
+        </header>
+        <main class="content-area"><?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><?php if ($ok): ?><div class="alert success"><?= e($ok) ?></div><?php endif; ?><?php if (!$a): ?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="../controller/c_aspirasi.php">Kembali</a><?php else: ?><div class="heading">
+                    <div>
+                        <p class="eyebrow">Aspirasi #<?= $a['id_aspirasi'] ?></p>
+                        <h1><?= e($a['nama_kategori']) ?></h1>
+                        <p class="muted"><?= e($a['nama_siswa']) ?> · <?= e($a['nis']) ?></p>
+                    </div><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span>
+                </div>
+                <div class="detail">
+                    <section class="panel">
+                        <h2>Detail Laporan</h2>
+                        <p><b>Pelapor</b><?= e($a['nama_siswa']) ?> · <?= e($a['kelas']) ?></p>
+                        <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
+                        <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
+                        <p><b>Feedback</b><?= e($a['feedback'] ?: '-') ?></p>
+                        <p><b>Dibuat</b><?= e($a['tanggal']) ?></p><?php if ($lampiran): ?><div style="margin-top:10px"><b>Foto Lampiran</b>
+                                <div class="lampiran-grid"><?php foreach ($lampiran as $lf): ?><a href="../<?= e($lf['url_file']) ?>" target="_blank"><img src="../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                            </div><?php endif; ?>
+                    </section>
+                    <section class="panel">
+                        <h2>Perbarui Status</h2>
+                        <form method="post" class="admin-form" enctype="multipart/form-data"><label>Status<select name="status">
+                                    <option <?= $a['status'] === 'Menunggu' ? 'selected' : '' ?>>Menunggu</option>
+                                    <option <?= $a['status'] === 'Proses' ? 'selected' : '' ?>>Proses</option>
+                                    <option <?= $a['status'] === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
+                                </select></label><label>Feedback<textarea name="feedback" maxlength="255"><?= e($a['feedback'] ?? '') ?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form>
+                    </section>
+                </div>
+                <section class="panel">
+                    <h2>Riwayat</h2>
+                    <div class="timeline"><?php foreach ($hist as $h): ?><div class="timeline-item"><b><?= e($h['status_baru']) ?></b><small><?= e($h['waktu_ubah']) ?> · <?= e($h['diubah_oleh']) ?></small>
+                                <div><?= e($h['catatan'] ?: '-') ?></div>
+                            </div><?php endforeach; ?></div>
+                </section><a class="btn secondary" href="../controller/c_aspirasi.php">← Kembali</a><?php endif; ?>
+        </main>
+    </div>
+</body>
+
+</html>
