@@ -41,7 +41,7 @@ $justRegistered = !empty($_GET['registered']);
       <div class="side-top">
         <div class="side-logo">PS</div>
         <h1>Pengaduan Sarana &amp; Prasarana</h1>
-        <p>Laporkan kerusakan fasilitas sekolah, pantau progres perbaikannya secara transparan dan real-time.</p>
+        <p>Laporkan kerusakan fasilitas sekolah</p>
       </div>
       <div class="side-features">
         <div class="side-feature">
@@ -57,7 +57,6 @@ $justRegistered = !empty($_GET['registered']);
           <span>Riwayat &amp; histori tindak lanjut tercatat rapi</span>
         </div>
       </div>
-      <div class="side-bottom">&copy; <?=date('Y')?> Pengaduan Sarpras · Sistem Internal Sekolah</div>
     </div>
 
     <div class="auth-form-panel">
@@ -100,13 +99,6 @@ $justRegistered = !empty($_GET['registered']);
         </div>
         <button type="submit" class="btn-primary">Masuk</button>
       </form>
-
-      <div class="role-hint">
-        <b>Login otomatis berdasarkan database.</b><br>
-        Jika akun ditemukan di tabel <code>admin</code>, kamu masuk sebagai Admin. Jika ditemukan di tabel <code>siswa</code>, kamu masuk sebagai Siswa.
-      </div>
-    </div>
-
   </section>
 </main>
 
