@@ -30,4 +30,4 @@ if ($id_lampiran > 0 && $id_aspirasi > 0) {
     }
 }
 
-redirect('../controller/c_user_edit.php?id=' . $id_aspirasi);
+redirect('../view/user/edit_laporan.php?id=' . $id_aspirasi);

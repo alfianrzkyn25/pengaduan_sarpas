@@ -1,4 +1,13 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Histori Laporan</title><link rel="stylesheet" href="../assets/admin.css">
+<?php
+require_once __DIR__ . '/../../config/database.php';
+require_role('admin');
+$user = current_user();
+$stats=['menunggu'=>0,'proses'=>0,'selesai'=>0];
+$rs=mysqli_query($conn,"SELECT status_baru,COUNT(*) jumlah FROM histori GROUP BY status_baru");
+while($x=mysqli_fetch_assoc($rs)){ $key=strtolower($x['status_baru']); if(isset($stats[$key])) $stats[$key]=(int)$x['jumlah']; }
+$r=mysqli_query($conn,"SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh) diubah_oleh FROM histori h LEFT JOIN aspirasi a ON a.id_aspirasi=h.id_aspirasi LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN admin ad ON ad.id_admin=h.id_admin ORDER BY h.waktu_ubah DESC,h.id_histori DESC");
+?>
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Histori Laporan</title><link rel="stylesheet" href="../../assets/admin.css">
 <style>
 .btn-hapus{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;font-size:12px;background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;border-radius:6px;cursor:pointer;font-weight:600;transition:background .15s;}
 .btn-hapus:hover{background:#fca5a5;}
@@ -15,12 +24,12 @@
 </head><body>
 <input type="checkbox" id="menuToggle" class="menu-toggle">
 <aside class="sidebar" id="sidebar"><div class="sidebar-header">Pengaduan Sarpras</div><ul>
-<li><a href="../controller/c_dashboard.php" class="">Dashboard</a></li>
-<li><a href="../controller/c_aspirasi.php" class="">Data Aspirasi</a></li>
-<li><a href="../controller/c_tambah_aspirasi.php" class="">form aspirasi</a></li>
-<li><a href="../controller/c_histori.php" class="active">Histori Laporan</a></li>
-<li><a href="../controller/c_kategori.php" class="">Kategori Sarpras</a></li>
-<li><a href="../logout.php">Keluar</a></li>
+<li><a href="dashboard.php" class="">Dashboard</a></li>
+<li><a href="aspirasi.php" class="">Data Aspirasi</a></li>
+<li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
+<li><a href="histori.php" class="active">Histori Laporan</a></li>
+<li><a href="kategori.php" class="">Kategori Sarpras</a></li>
+<li><a href="../../logout.php">Keluar</a></li>
 </ul><div class="admin-user"><strong><?=e($user["nama"]??"Admin")?></strong>Administrator</div></aside>
 <label for="menuToggle" class="sidebar-overlay"></label>
 <div class="main-content">
@@ -42,7 +51,7 @@
 <?php while($h=mysqli_fetch_assoc($r)):?>
 <tr>
   <td><?=$h['id_histori']?></td>
-  <td><a class="btn secondary" style="padding:4px 8px" href="../controller/c_detail_aspirasi.php?id=<?=$h['id_aspirasi']?>">#<?=$h['id_aspirasi']?></a></td>
+  <td><a class="btn secondary" style="padding:4px 8px" href="detail_aspirasi.php?id=<?=$h['id_aspirasi']?>">#<?=$h['id_aspirasi']?></a></td>
   <td><?=e($h['status_lama']?:'-')?></td>
   <td><span class="badge <?=strtolower($h['status_baru'])?>"><?=e($h['status_baru'])?></span></td>
   <td><?=e($h['catatan']?:'-')?></td>
@@ -65,9 +74,9 @@
     <p>Entri histori ini akan dihapus permanen dan tidak dapat dikembalikan.</p>
     <div class="modal-actions">
       <button class="btn-batal" onclick="tutupModal()">Batal</button>
-      <form method="POST" action="../controller/c_hapus_histori.php" style="display:inline">
+      <form method="POST" action="../../controller/c_hapus_histori.php" style="display:inline">
         <input type="hidden" name="id_histori" id="inputIdHistori" value="">
-        <input type="hidden" name="back" value="../controller/c_histori.php">
+        <input type="hidden" name="back" value="../view/admin/histori.php">
         <button type="submit" class="btn-konfirm">Ya, Hapus</button>
       </form>
     </div>

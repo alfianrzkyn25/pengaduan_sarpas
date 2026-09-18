@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/config/database.php';
 if (!empty($_SESSION['role'])) {
-    redirect($_SESSION['role']==='admin' ? 'controller/c_dashboard.php' : 'controller/c_user_dashboard.php');
+    redirect($_SESSION['role']==='admin' ? 'view/admin/dashboard.php' : 'view/user/dashboard.php');
 }
 $error='';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
@@ -12,13 +12,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         mysqli_stmt_bind_param($st,'s',$login); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st); $admin=mysqli_fetch_assoc($r); mysqli_stmt_close($st);
         if ($admin && hash_equals((string)$admin['password'],(string)$password)) {
             session_regenerate_id(true); unset($_SESSION['nis']); $_SESSION['role']='admin'; $_SESSION['id_admin']=(int)$admin['id_admin']; $_SESSION['nama']=$admin['nama'];
-            redirect('controller/c_dashboard.php');
+            redirect('view/admin/dashboard.php');
         }
         $st=mysqli_prepare($conn,'SELECT nis,nama,kelas,password FROM siswa WHERE nis=? LIMIT 1');
         mysqli_stmt_bind_param($st,'s',$login); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st); $siswa=mysqli_fetch_assoc($r); mysqli_stmt_close($st);
         if ($siswa && hash_equals((string)$siswa['password'],(string)$password)) {
             session_regenerate_id(true); unset($_SESSION['id_admin']); $_SESSION['role']='siswa'; $_SESSION['nis']=$siswa['nis']; $_SESSION['nama']=$siswa['nama'];
-            redirect('controller/c_user_dashboard.php');
+            redirect('view/user/dashboard.php');
         }
         $error='Akun tidak ditemukan atau password salah.';
     }

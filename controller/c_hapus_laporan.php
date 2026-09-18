@@ -35,8 +35,8 @@ if ($id > 0) {
         mysqli_stmt_close($st);
 
         mysqli_commit($conn);
-        redirect('../controller/c_user_laporan.php?deleted=1');
+        redirect('../view/user/laporan_saya.php?deleted=1');
     }
 }
 
-redirect('../controller/c_user_laporan.php?error=1');
+redirect('../view/user/laporan_saya.php?error=1');

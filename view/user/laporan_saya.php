@@ -1,6 +1,12 @@
+<?php
+require_once __DIR__ . '/../../config/database.php';
+require_role('siswa');
+$user=current_user();
+$st=mysqli_prepare($conn,'SELECT a.id_aspirasi,a.lokasi,a.keterangan,a.status,a.tanggal,k.nama_kategori FROM aspirasi a LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.nis=? ORDER BY a.tanggal DESC,a.id_aspirasi DESC'); mysqli_stmt_bind_param($st,'s',$user['nis']); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st);
+?>
 <!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Laporan Saya</title>
-<link rel="stylesheet" href="../assets/admin.css">
+<link rel="stylesheet" href="../../assets/admin.css">
 <style>
 .item-wrap { position: relative; }
 .item.has-action { padding-right: 175px; }
@@ -92,10 +98,10 @@
   <div class="sidebar-header">Pengaduan Sarpras</div>
   <div class="sidebar-sub">Portal Siswa</div>
   <ul>
-    <li><a href="../controller/c_user_dashboard.php">Beranda</a></li>
-    <li><a href="../controller/c_user_tambah.php">Buat Pengaduan</a></li>
-    <li><a href="../controller/c_user_laporan.php" class="active">Laporan Saya</a></li>
-    <li><a href="../logout.php">Keluar</a></li>
+    <li><a href="dashboard.php">Beranda</a></li>
+    <li><a href="buat_pengaduan.php">Buat Pengaduan</a></li>
+    <li><a href="laporan_saya.php" class="active">Laporan Saya</a></li>
+    <li><a href="../../logout.php">Keluar</a></li>
   </ul>
   <div class="admin-user"><strong><?=e($user['nama']??'Siswa')?></strong>Siswa</div>
 </aside>
@@ -124,7 +130,7 @@
     <h1>Laporan Saya</h1>
     <p class="muted">Semua pengaduan yang kamu kirim.</p>
   </div>
-  <a class="btn" href="../controller/c_user_tambah.php">+ Buat Pengaduan</a>
+  <a class="btn" href="buat_pengaduan.php">+ Buat Pengaduan</a>
 </div>
 
 <section class="panel"><div class="list">
@@ -136,7 +142,7 @@
 <?php while($a = mysqli_fetch_assoc($r)): ?>
 <div class="item-wrap">
   <a class="item has-action"
-     href="../controller/c_user_detail.php?id=<?=(int)$a['id_aspirasi']?>">
+     href="detail_laporan.php?id=<?=(int)$a['id_aspirasi']?>">
     <div>
       <b>#<?=(int)$a['id_aspirasi']?> &middot; <?=e($a['nama_kategori'])?></b>
       <span><?=e($a['lokasi'])?></span>
@@ -147,7 +153,7 @@
 
   <div class="item-actions">
     <a class="btn-edit-user"
-       href="../controller/c_user_edit.php?id=<?=(int)$a['id_aspirasi']?>">
+       href="edit_laporan.php?id=<?=(int)$a['id_aspirasi']?>">
       &#9998; Edit
     </a>
     <button class="btn-hapus-user"
@@ -169,7 +175,7 @@
     <small id="modalNote"></small>
     <div class="modal-actions">
       <button class="btn-batal" onclick="tutupModal()">Batal</button>
-      <form method="POST" action="../controller/c_hapus_laporan.php" style="display:inline">
+      <form method="POST" action="../../controller/c_hapus_laporan.php" style="display:inline">
         <input type="hidden" name="id_aspirasi" id="inputIdAspirasi" value="">
         <button type="submit" class="btn-konfirm">Ya, Hapus</button>
       </form>

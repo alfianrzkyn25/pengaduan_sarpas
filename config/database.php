@@ -12,8 +12,18 @@ mysqli_set_charset($conn, 'utf8mb4');
 
 function e($value) { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
 function redirect($path) { header('Location: ' . $path); exit; }
-function require_login() { if (empty($_SESSION['role'])) redirect('../login.php'); }
-function require_role($role) { require_login(); if ($_SESSION['role'] !== $role) redirect('../login.php'); }
+
+// Menghitung path relatif ke login.php dari file yang sedang dijalankan,
+// supaya benar baik dipanggil dari root/, controller/, maupun view/admin|user/.
+function login_redirect_path() {
+    $root    = str_replace('\\', '/', dirname(__DIR__));           // .../pengaduan_sarpas
+    $current = str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME']));
+    $rel     = trim(str_replace($root, '', $current), '/');
+    $depth   = $rel === '' ? 0 : substr_count($rel, '/') + 1;
+    return str_repeat('../', $depth) . 'login.php';
+}
+function require_login() { if (empty($_SESSION['role'])) redirect(login_redirect_path()); }
+function require_role($role) { require_login(); if ($_SESSION['role'] !== $role) redirect(login_redirect_path()); }
 function current_user() {
     global $conn;
     if (empty($_SESSION['role'])) return null;
