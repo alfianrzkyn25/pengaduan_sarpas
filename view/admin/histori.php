@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../config/database.php';
 require_role('admin');
 $user = current_user();
-$stats=['menunggu'=>0,'proses'=>0,'selesai'=>0];
+$stats=['menunggu'=>0,'proses'=>0,'selesai'=>0,'ditolak'=>0];
 $rs=mysqli_query($conn,"SELECT status_baru,COUNT(*) jumlah FROM histori GROUP BY status_baru");
 while($x=mysqli_fetch_assoc($rs)){ $key=strtolower($x['status_baru']); if(isset($stats[$key])) $stats[$key]=(int)$x['jumlah']; }
 $r=mysqli_query($conn,"SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh) diubah_oleh FROM histori h LEFT JOIN aspirasi a ON a.id_aspirasi=h.id_aspirasi LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN admin ad ON ad.id_admin=h.id_admin ORDER BY h.waktu_ubah DESC,h.id_histori DESC");
@@ -40,10 +40,11 @@ $r=mysqli_query($conn,"SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh) d
 <div class="alert-success">&#10003; Histori berhasil dihapus.</div>
 <?php endif; ?>
 
-<div class="grid-3">
+<div class="grid">
 <div class="card stat"><span>Menunggu</span><strong><?=$stats['menunggu']?></strong></div>
 <div class="card stat"><span>Proses</span><strong><?=$stats['proses']?></strong></div>
 <div class="card stat"><span>Selesai</span><strong><?=$stats['selesai']?></strong></div>
+<div class="card stat"><span>Ditolak</span><strong><?=$stats['ditolak']?></strong></div>
 </div>
 <section class="panel"><h2 style="margin-top:0">Riwayat Perubahan Status</h2>
 <div style="overflow:auto"><table class="table">

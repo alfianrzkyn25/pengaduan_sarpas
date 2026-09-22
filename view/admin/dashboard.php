@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../config/database.php';
 require_role('admin');
 $user = current_user();
-$stats=['total'=>0,'menunggu'=>0,'proses'=>0,'selesai'=>0];
+$stats=['total'=>0,'menunggu'=>0,'proses'=>0,'selesai'=>0,'ditolak'=>0];
 $r=mysqli_query($conn,"SELECT status,COUNT(*) jumlah FROM aspirasi GROUP BY status");
 while($x=mysqli_fetch_assoc($r)){ $stats['total']+=(int)$x['jumlah']; $key=strtolower($x['status']); if(isset($stats[$key])) $stats[$key]=(int)$x['jumlah']; }
 $r=mysqli_query($conn,"SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lokasi,a.keterangan,a.status,a.tanggal FROM aspirasi a LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori ORDER BY a.tanggal DESC,a.id_aspirasi DESC LIMIT 5");
@@ -26,6 +26,7 @@ $r=mysqli_query($conn,"SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lokas
 <div class="card stat"><span>Menunggu</span><strong><?=$stats['menunggu']?></strong></div>
 <div class="card stat"><span>Proses</span><strong><?=$stats['proses']?></strong></div>
 <div class="card stat"><span>Selesai</span><strong><?=$stats['selesai']?></strong></div>
+<div class="card stat"><span>Ditolak</span><strong><?=$stats['ditolak']?></strong></div>
 </div>
 <section class="panel"><div class="panel-head"><h2>5 Aspirasi Terbaru</h2><a href="aspirasi.php">Kelola semua</a></div>
 <div style="overflow:auto"><table class="table">

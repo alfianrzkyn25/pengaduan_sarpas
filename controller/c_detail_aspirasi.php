@@ -11,8 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hasFile = !empty($_FILES['foto_feedback']['name']);
     $fotoExt = $hasFile ? strtolower(pathinfo($_FILES['foto_feedback']['name'], PATHINFO_EXTENSION)) : '';
 
-    if (!in_array($status, ['Menunggu', 'Proses', 'Selesai'], true)) {
+    if (!in_array($status, ['Menunggu', 'Proses', 'Selesai', 'Ditolak'], true)) {
         $error = 'Status tidak valid.';
+    } elseif ($status === 'Ditolak' && $feedback === '') {
+        $error = 'Feedback wajib diisi saat menolak aspirasi (alasan penolakan).';
     } elseif ($hasFile && $_FILES['foto_feedback']['error'] !== UPLOAD_ERR_OK) {
         $error = 'Gagal mengunggah foto. Silakan coba lagi.';
     } elseif ($hasFile && !isset($allowedExt[$fotoExt])) {
@@ -38,7 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_close($st);
 
             if ($okq) {
-                $note = $catatan !== '' ? $catatan : 'Status aspirasi diperbarui.';
+                if ($catatan !== '') {
+                    $note = $catatan;
+                } elseif ($status === 'Ditolak') {
+                    $note = 'Aspirasi ditolak: ' . $feedback;
+                } else {
+                    $note = 'Status aspirasi diperbarui.';
+                }
                 $st = mysqli_prepare($conn, 'INSERT INTO histori (id_aspirasi,id_admin,status_lama,status_baru,catatan,diubah_oleh) VALUES (?,?,?,?,?,?)');
                 $adminId = (int)$user['id_admin'];
                 $by = $user['nama'] ?? 'admin';
