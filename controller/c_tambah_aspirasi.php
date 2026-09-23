@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__ . '/../config/database.php'; require_role('admin'); $user=current_user(); $error='';
+require_once __DIR__ . '/../config/database.php';
+require_role('admin');
+$user = current_user();
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nis = trim($_POST['nis'] ?? '');
     $idk = (int)($_POST['id_kategori'] ?? 0);

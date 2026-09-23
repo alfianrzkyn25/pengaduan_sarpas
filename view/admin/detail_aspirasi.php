@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
-require_role('admin'); $user=current_user(); $id=(int)($_GET['id']??0); $error=''; $ok='';
+require_role('admin');
+$user = current_user();
+$id = (int)($_GET['id'] ?? 0);
+$error = '';
+$ok = '';
+
+// Urutan status yang wajib diikuti (tidak boleh mundur/meloncat).
+$urutanStatus = ['Menunggu', 'Proses', 'Selesai'];
+$statusBerikut = ['Menunggu' => 'Proses', 'Proses' => 'Selesai', 'Selesai' => null];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = trim($_POST['status'] ?? '');
@@ -12,10 +20,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hasFile = !empty($_FILES['foto_feedback']['name']);
     $fotoExt = $hasFile ? strtolower(pathinfo($_FILES['foto_feedback']['name'], PATHINFO_EXTENSION)) : '';
 
-    if (!in_array($status, ['Menunggu', 'Proses', 'Selesai', 'Ditolak'], true)) {
+    $st = mysqli_prepare($conn, 'SELECT status FROM aspirasi WHERE id_aspirasi=?');
+    mysqli_stmt_bind_param($st, 'i', $id);
+    mysqli_stmt_execute($st);
+    $old = mysqli_fetch_assoc(mysqli_stmt_get_result($st));
+    mysqli_stmt_close($st);
+
+    $bolehTolak = $old && $old['status'] !== 'Ditolak' && $old['status'] !== 'Selesai';
+    $statusValid = $old && (
+        $status === $old['status'] ||
+        $status === ($statusBerikut[$old['status']] ?? null) ||
+        ($status === 'Ditolak' && $bolehTolak)
+    );
+
+    if (!$old) {
+        $error = 'Data aspirasi tidak ditemukan.';
+    } elseif ($old['status'] === 'Ditolak') {
+        $error = 'Aspirasi ini sudah berstatus Ditolak dan terkunci, tidak dapat diubah lagi.';
+    } elseif (!in_array($status, ['Menunggu', 'Proses', 'Selesai', 'Ditolak'], true)) {
         $error = 'Status tidak valid.';
-    } elseif ($status === 'Ditolak' && $feedback === '') {
-        $error = 'Feedback wajib diisi saat menolak aspirasi (alasan penolakan).';
+    } elseif (!$statusValid) {
+        $error = 'Status harus berurutan (Menunggu → Proses → Selesai), tidak boleh mundur atau meloncat.';
     } elseif ($hasFile && $_FILES['foto_feedback']['error'] !== UPLOAD_ERR_OK) {
         $error = 'Gagal mengunggah foto. Silakan coba lagi.';
     } elseif ($hasFile && !isset($allowedExt[$fotoExt])) {
@@ -25,63 +50,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($hasFile && !@getimagesize($_FILES['foto_feedback']['tmp_name'])) {
         $error = 'File yang diunggah bukan gambar yang valid.';
     } else {
-        $st = mysqli_prepare($conn, 'SELECT status FROM aspirasi WHERE id_aspirasi=?');
-        mysqli_stmt_bind_param($st, 'i', $id);
-        mysqli_stmt_execute($st);
-        $old = mysqli_fetch_assoc(mysqli_stmt_get_result($st));
+        mysqli_begin_transaction($conn);
+        $st = mysqli_prepare($conn, 'UPDATE aspirasi SET status=?, feedback=? WHERE id_aspirasi=?');
+        mysqli_stmt_bind_param($st, 'ssi', $status, $feedback, $id);
+        $okq = mysqli_stmt_execute($st);
+        if (!$okq) {
+            $error = 'Gagal memperbarui status aspirasi: ' . mysqli_stmt_error($st);
+        }
         mysqli_stmt_close($st);
 
-        if (!$old) {
-            $error = 'Data aspirasi tidak ditemukan.';
-        } else {
-            mysqli_begin_transaction($conn);
-            $st = mysqli_prepare($conn, 'UPDATE aspirasi SET status=?, feedback=? WHERE id_aspirasi=?');
-            mysqli_stmt_bind_param($st, 'ssi', $status, $feedback, $id);
+        if ($okq) {
+            // Pastikan nilai status benar-benar tersimpan sesuai yang dipilih.
+            $chk = mysqli_prepare($conn, 'SELECT status FROM aspirasi WHERE id_aspirasi=?');
+            mysqli_stmt_bind_param($chk, 'i', $id);
+            mysqli_stmt_execute($chk);
+            $chkRow = mysqli_fetch_assoc(mysqli_stmt_get_result($chk));
+            mysqli_stmt_close($chk);
+            if (!$chkRow || $chkRow['status'] !== $status) {
+                $okq = false;
+                $error = "Status \"$status\" belum dikenali oleh database (kolom status di tabel aspirasi belum memuat nilai ini). Jalankan dulu ALTER TABLE untuk menambahkan status baru ke kolom ENUM.";
+            }
+        }
+
+        if ($okq) {
+            if ($catatan !== '') {
+                $note = $catatan;
+            } elseif ($status === 'Ditolak') {
+                $note = $feedback !== '' ? ('Aspirasi ditolak: ' . $feedback) : 'Aspirasi ditolak.';
+            } else {
+                $note = 'Status aspirasi diperbarui.';
+            }
+            $st = mysqli_prepare($conn, 'INSERT INTO histori (id_aspirasi,id_admin,status_lama,status_baru,catatan,diubah_oleh) VALUES (?,?,?,?,?,?)');
+            $adminId = (int)$user['id_admin'];
+            $by = $user['nama'] ?? 'admin';
+            mysqli_stmt_bind_param($st, 'iissss', $id, $adminId, $old['status'], $status, $note, $by);
             $okq = mysqli_stmt_execute($st);
+            if (!$okq) {
+                $error = 'Gagal menyimpan riwayat status: ' . mysqli_stmt_error($st);
+            }
             mysqli_stmt_close($st);
+        }
 
-            if ($okq) {
-                if ($catatan !== '') {
-                    $note = $catatan;
-                } elseif ($status === 'Ditolak') {
-                    $note = 'Aspirasi ditolak: ' . $feedback;
-                } else {
-                    $note = 'Status aspirasi diperbarui.';
+        if ($okq) {
+            mysqli_commit($conn);
+            if ($hasFile) {
+                $dir = __DIR__ . '/../../assets/uploads/aspirasi/' . $id;
+                if (!is_dir($dir)) mkdir($dir, 0777, true);
+                $filename = 'feedback-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6) . '.' . $fotoExt;
+                if (move_uploaded_file($_FILES['foto_feedback']['tmp_name'], $dir . '/' . $filename)) {
+                    $urlFile = 'assets/uploads/aspirasi/' . $id . '/' . $filename;
+                    $origName = $_FILES['foto_feedback']['name'];
+                    $lp = mysqli_prepare($conn, 'INSERT INTO lampiran (id_aspirasi, url_file, nama_file) VALUES (?,?,?)');
+                    mysqli_stmt_bind_param($lp, 'iss', $id, $urlFile, $origName);
+                    mysqli_stmt_execute($lp);
+                    mysqli_stmt_close($lp);
                 }
-                $st = mysqli_prepare($conn, 'INSERT INTO histori (id_aspirasi,id_admin,status_lama,status_baru,catatan,diubah_oleh) VALUES (?,?,?,?,?,?)');
-                $adminId = (int)$user['id_admin'];
-                $by = $user['nama'] ?? 'admin';
-                mysqli_stmt_bind_param($st, 'iissis', $id, $adminId, $old['status'], $status, $note, $by);
-                $okq = mysqli_stmt_execute($st);
-                mysqli_stmt_close($st);
             }
-
-            if ($okq) {
-                mysqli_commit($conn);
-                if ($hasFile) {
-                    $dir = __DIR__ . '/../../assets/uploads/aspirasi/' . $id;
-                    if (!is_dir($dir)) mkdir($dir, 0777, true);
-                    $filename = 'feedback-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(3)), 0, 6) . '.' . $fotoExt;
-                    if (move_uploaded_file($_FILES['foto_feedback']['tmp_name'], $dir . '/' . $filename)) {
-                        $urlFile = 'assets/uploads/aspirasi/' . $id . '/' . $filename;
-                        $origName = $_FILES['foto_feedback']['name'];
-                        $lp = mysqli_prepare($conn, 'INSERT INTO lampiran (id_aspirasi, url_file, nama_file) VALUES (?,?,?)');
-                        mysqli_stmt_bind_param($lp, 'iss', $id, $urlFile, $origName);
-                        mysqli_stmt_execute($lp);
-                        mysqli_stmt_close($lp);
-                    }
-                }
-                redirect('detail_aspirasi.php?id=' . $id . '&updated=1');
-            }
-            mysqli_rollback($conn);
-            $error = 'Data gagal diperbarui: ' . mysqli_error($conn);
+            redirect('detail_aspirasi.php?id=' . $id . '&updated=1');
+        }
+        mysqli_rollback($conn);
+        if ($error === '') {
+            $error = 'Data gagal diperbarui.';
         }
     }
 }
 
 if (isset($_GET['updated'])) $ok = 'Status dan feedback berhasil diperbarui.';
 
-$a = null; $hist = [];
+$a = null;
+$hist = [];
 $st = mysqli_prepare($conn, 'SELECT a.*,s.nama AS nama_siswa,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=?');
 mysqli_stmt_bind_param($st, 'i', $id);
 mysqli_stmt_execute($st);
@@ -106,16 +143,72 @@ if ($a) {
     while ($lf = mysqli_fetch_assoc($lr)) $lampiran[] = $lf;
     mysqli_stmt_close($st);
 }
-?>
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detail Aspirasi</title><link rel="stylesheet" href="../../assets/admin.css"></head><body><input type="checkbox" id="menuToggle" class="menu-toggle"><aside class="sidebar" id="sidebar"><div class="sidebar-header">Pengaduan Sarpras</div><ul><li><a href="dashboard.php" class="">Dashboard</a></li><li><a href="aspirasi.php" class="active">Data Aspirasi</a></li><li><a href="form_aspirasi.php" class="">form aspirasi</a></li><li><a href="histori.php" class="">Histori Laporan</a></li><li><a href="kategori.php" class="">Kategori Sarpras</a></li><li><a href="../../logout.php">Keluar</a></li></ul><div class="admin-user"><strong><?=e($user["nama"]??"Admin")?></strong>Administrator</div></aside><label for="menuToggle" class="sidebar-overlay"></label><div class="main-content"><header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label><h1>Detail Aspirasi</h1></header><main class="content-area"><?php if($error):?><div class="alert error"><?=e($error)?></div><?php endif;?><?php if($ok):?><div class="alert success"><?=e($ok)?></div><?php endif;?><?php if(!$a):?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="aspirasi.php">Kembali</a><?php else:?><div class="heading"><div><p class="eyebrow">Aspirasi #<?=$a['id_aspirasi']?></p><h1><?=e($a['nama_kategori'])?></h1><p class="muted"><?=e($a['nama_siswa'])?> · <?=e($a['nis'])?></p></div><span class="badge <?=strtolower($a['status'])?>"><?=e($a['status'])?></span></div><?php if($a['status']==='Ditolak'):?><div class="alert error" style="margin-top:-8px">Aspirasi ini telah <b>ditolak</b>. Alasan: <?=e($a['feedback']?:'-')?></div><?php endif;?><div class="detail"><section class="panel"><h2>Detail Laporan</h2><p><b>Pelapor</b><?=e($a['nama_siswa'])?> · <?=e($a['kelas'])?></p><p><b>Lokasi</b><?=e($a['lokasi'])?></p><p><b>Keterangan</b><?=e($a['keterangan'])?></p><p><b>Feedback</b><?=e($a['feedback']?:'-')?></p><p><b>Dibuat</b><?=e($a['tanggal'])?></p><?php if($lampiran):?><div style="margin-top:10px"><b>Foto Lampiran</b><div class="lampiran-grid"><?php foreach($lampiran as $lf):?><a href="../../<?=e($lf['url_file'])?>" target="_blank"><img src="../../<?=e($lf['url_file'])?>" alt="<?=e($lf['nama_file'])?>"></a><?php endforeach;?></div></div><?php endif;?></section><section class="panel"><h2>Perbarui Status</h2><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status<select name="status" id="statusSelect" onchange="toggleFeedbackHint()"><option <?=$a['status']==='Menunggu'?'selected':''?>>Menunggu</option><option <?=$a['status']==='Proses'?'selected':''?>>Proses</option><option <?=$a['status']==='Selesai'?'selected':''?>>Selesai</option><option value="Ditolak" <?=$a['status']==='Ditolak'?'selected':''?>>Ditolak</option></select></label><label>Feedback <span id="feedbackHint" style="color:#dc2626;font-weight:700;display:none">(wajib diisi &mdash; alasan penolakan)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?=e($a['feedback']??'')?></textarea></label>
-<script>
-function toggleFeedbackHint(){
-  var sel = document.getElementById('statusSelect');
-  var hint = document.getElementById('feedbackHint');
-  var fb = document.getElementById('feedbackInput');
-  var reject = sel.value === 'Ditolak';
-  hint.style.display = reject ? 'inline' : 'none';
-  fb.required = reject;
+
+// Opsi status yang boleh dipilih dari status saat ini: tetap di status sekarang,
+// maju satu langkah sesuai urutan, atau Ditolak (kalau belum Selesai/Ditolak).
+$opsiStatus = [];
+if ($a && $a['status'] !== 'Ditolak') {
+    $opsiStatus[] = $a['status'];
+    if (!empty($statusBerikut[$a['status']])) $opsiStatus[] = $statusBerikut[$a['status']];
+    if ($a['status'] !== 'Selesai') $opsiStatus[] = 'Ditolak';
 }
-document.addEventListener('DOMContentLoaded', toggleFeedbackHint);
-</script><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form></section></div><section class="panel"><h2>Riwayat</h2><div class="timeline"><?php foreach($hist as $h):?><div class="timeline-item"><b><?=e($h['status_baru'])?></b><small><?=e($h['waktu_ubah'])?> · <?=e($h['diubah_oleh'])?></small><div><?=e($h['catatan']?:'-')?></div></div><?php endforeach;?></div></section><a class="btn secondary" href="aspirasi.php">← Kembali</a><?php endif;?></main></div></body></html>
+?>
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Detail Aspirasi</title>
+    <link rel="stylesheet" href="../../assets/admin.css">
+</head>
+
+<body><input type="checkbox" id="menuToggle" class="menu-toggle">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">Pengaduan Sarpras</div>
+        <ul>
+            <li><a href="dashboard.php" class="">Dashboard</a></li>
+            <li><a href="aspirasi.php" class="active">Data Aspirasi</a></li>
+            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
+            <li><a href="histori.php" class="">Histori Laporan</a></li>
+            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
+            <li><a href="../../logout.php">Keluar</a></li>
+        </ul>
+        <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
+    </aside><label for="menuToggle" class="sidebar-overlay"></label>
+    <div class="main-content">
+        <header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label>
+            <h1>Detail Aspirasi</h1>
+        </header>
+        <main class="content-area"><?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><?php if ($ok): ?><div class="alert success"><?= e($ok) ?></div><?php endif; ?><?php if (!$a): ?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="aspirasi.php">Kembali</a><?php else: ?><div class="heading">
+                    <div>
+                        <p class="eyebrow">Aspirasi #<?= $a['id_aspirasi'] ?></p>
+                        <h1><?= e($a['nama_kategori']) ?></h1>
+                        <p class="muted"><?= e($a['nama_siswa']) ?> · <?= e($a['nis']) ?></p>
+                    </div><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span>
+                </div><?php if ($a['status'] === 'Ditolak'): ?><div class="alert error" style="margin-top:-8px">Aspirasi ini telah <b>ditolak</b> dan statusnya terkunci (tidak dapat diubah lagi). Alasan: <?= e($a['feedback'] ?: '-') ?></div><?php endif; ?><div class="detail">
+                    <section class="panel">
+                        <h2>Detail Laporan</h2>
+                        <p><b>Pelapor</b><?= e($a['nama_siswa']) ?> · <?= e($a['kelas']) ?></p>
+                        <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
+                        <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
+                        <p><b>Feedback</b><?= e($a['feedback'] ?: '-') ?></p>
+                        <p><b>Dibuat</b><?= e($a['tanggal']) ?></p><?php if ($lampiran): ?><div style="margin-top:10px"><b>Foto Lampiran</b>
+                                <div class="lampiran-grid"><?php foreach ($lampiran as $lf): ?><a href="../../<?= e($lf['url_file']) ?>" target="_blank"><img src="../../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                            </div><?php endif; ?>
+                    </section>
+                    <section class="panel">
+                        <h2>Perbarui Status</h2><?php if ($a['status'] === 'Ditolak'): ?><p class="muted">Aspirasi ini sudah ditolak. Status terkunci dan tidak bisa diubah lagi.</p><?php else: ?><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status <span style="color:#6b7280;font-weight:400">(urut: Menunggu → Proses → Selesai)</span><select name="status" id="statusSelect"><?php foreach ($opsiStatus as $opt): ?><option value="<?= $opt ?>" <?= $a['status'] === $opt ? 'selected' : '' ?>><?= $opt ?></option><?php endforeach; ?></select></label><label>Feedback <span style="color:#6b7280;font-weight:400">(opsional)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?= e($a['feedback'] ?? '') ?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form><?php endif; ?>
+                    </section>
+                </div>
+                <section class="panel">
+                    <h2>Riwayat</h2>
+                    <div class="timeline"><?php foreach ($hist as $h): ?><div class="timeline-item"><b><?= e($h['status_baru']) ?></b><small><?= e($h['waktu_ubah']) ?> · <?= e($h['diubah_oleh']) ?></small>
+                                <div><?= e($h['catatan'] ?: '-') ?></div>
+                            </div><?php endforeach; ?></div>
+                </section><a class="btn secondary" href="aspirasi.php">← Kembali</a><?php endif; ?>
+        </main>
+    </div>
+</body>
+
+</html>
