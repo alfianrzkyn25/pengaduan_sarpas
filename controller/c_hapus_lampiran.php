@@ -8,12 +8,10 @@ $id_aspirasi  = (int)($_POST['id_aspirasi']  ?? 0);
 
 if ($id_lampiran > 0 && $id_aspirasi > 0) {
     // Pastikan lampiran ini memang milik aspirasi si siswa yang masih Menunggu
-    $st = mysqli_prepare(
-        $conn,
+    $st = mysqli_prepare($conn,
         'SELECT l.url_file FROM lampiran l
          JOIN aspirasi a ON a.id_aspirasi=l.id_aspirasi
-         WHERE l.id_lampiran=? AND l.id_aspirasi=? AND a.nis=? AND a.status="Menunggu"'
-    );
+         WHERE l.id_lampiran=? AND l.id_aspirasi=? AND a.nis=? AND a.status="Menunggu"');
     mysqli_stmt_bind_param($st, 'iis', $id_lampiran, $id_aspirasi, $user['nis']);
     mysqli_stmt_execute($st);
     $row = mysqli_fetch_assoc(mysqli_stmt_get_result($st));

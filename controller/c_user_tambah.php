@@ -1,8 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-require_role('siswa');
-$user = current_user();
-$error = '';
+require_once __DIR__ . '/../config/database.php'; require_role('siswa'); $user = current_user(); $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idk = (int)($_POST['id_kategori'] ?? 0);

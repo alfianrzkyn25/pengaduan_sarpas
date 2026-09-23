@@ -1,10 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-require_role('admin');
-$user = current_user();
-$id = (int)($_GET['id'] ?? 0);
-$error = '';
-$ok = '';
+require_once __DIR__ . '/../config/database.php'; require_role('admin'); $user=current_user(); $id=(int)($_GET['id']??0); $error=''; $ok='';
 
 // Urutan status yang wajib diikuti (tidak boleh mundur/meloncat).
 $urutanStatus = ['Menunggu', 'Proses', 'Selesai'];
@@ -54,9 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $st = mysqli_prepare($conn, 'UPDATE aspirasi SET status=?, feedback=? WHERE id_aspirasi=?');
         mysqli_stmt_bind_param($st, 'ssi', $status, $feedback, $id);
         $okq = mysqli_stmt_execute($st);
-        if (!$okq) {
-            $error = 'Gagal memperbarui status aspirasi: ' . mysqli_stmt_error($st);
-        }
+        if (!$okq) { $error = 'Gagal memperbarui status aspirasi: ' . mysqli_stmt_error($st); }
         mysqli_stmt_close($st);
 
         if ($okq) {
@@ -85,9 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $by = $user['nama'] ?? 'admin';
             mysqli_stmt_bind_param($st, 'iissss', $id, $adminId, $old['status'], $status, $note, $by);
             $okq = mysqli_stmt_execute($st);
-            if (!$okq) {
-                $error = 'Gagal menyimpan riwayat status: ' . mysqli_stmt_error($st);
-            }
+            if (!$okq) { $error = 'Gagal menyimpan riwayat status: ' . mysqli_stmt_error($st); }
             mysqli_stmt_close($st);
         }
 
@@ -117,8 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_GET['updated'])) $ok = 'Status dan feedback berhasil diperbarui.';
 
-$a = null;
-$hist = [];
+$a = null; $hist = [];
 $st = mysqli_prepare($conn, 'SELECT a.*,s.nama AS nama_siswa,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=?');
 mysqli_stmt_bind_param($st, 'i', $id);
 mysqli_stmt_execute($st);

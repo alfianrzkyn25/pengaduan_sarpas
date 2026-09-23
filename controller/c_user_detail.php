@@ -1,9 +1,6 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
-require_role('siswa');
-$user = current_user();
-$id = (int)($_GET['id'] ?? 0);
-$saved = isset($_GET['saved']);
+require_once __DIR__ . '/../config/database.php'; require_role('siswa'); $user = current_user();
+$id = (int)($_GET['id'] ?? 0); $saved = isset($_GET['saved']);
 
 $st = mysqli_prepare($conn, 'SELECT a.*,s.nama,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=? AND a.nis=?');
 mysqli_stmt_bind_param($st, 'is', $id, $user['nis']);

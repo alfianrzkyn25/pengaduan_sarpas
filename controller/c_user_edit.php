@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lokasi = trim($_POST['lokasi'] ?? '');
     $ket    = trim($_POST['keterangan'] ?? '');
 
-    $allowedExt = ['jpg' => 1, 'jpeg' => 1, 'png' => 1, 'gif' => 1, 'webp' => 1];
+    $allowedExt = ['jpg'=>1,'jpeg'=>1,'png'=>1,'gif'=>1,'webp'=>1];
     $maxSize    = 5 * 1024 * 1024;
     $hasFile    = !empty($_FILES['foto']['name']);
     $fotoExt    = $hasFile ? strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION)) : '';
