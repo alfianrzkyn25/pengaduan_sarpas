@@ -119,17 +119,6 @@ $st=mysqli_prepare($conn,'SELECT a.id_aspirasi,a.lokasi,a.keterangan,a.status,a.
   <h1>Laporan Saya</h1>
 </header>
 <main class="content-area">
-
-<?php if(isset($_GET['deleted'])): ?>
-  <div class="alert-success">&#10003; Laporan berhasil dihapus.</div>
-<?php elseif(isset($_GET['edited'])): ?>
-  <div class="alert-success">&#10003; Laporan berhasil diperbarui.</div>
-<?php elseif(isset($_GET['error'])): ?>
-  <div class="alert-error">&#9888; Laporan tidak dapat dihapus. Hanya laporan berstatus <strong>Menunggu</strong> yang bisa dihapus.</div>
-<?php elseif(isset($_GET['error_edit'])): ?>
-  <div class="alert-error">&#9888; Laporan tidak dapat diedit. Hanya laporan berstatus <strong>Menunggu</strong> yang bisa diedit.</div>
-<?php endif; ?>
-
 <div class="heading">
   <div>
     <p class="eyebrow">Riwayat</p>
@@ -156,17 +145,6 @@ $st=mysqli_prepare($conn,'SELECT a.id_aspirasi,a.lokasi,a.keterangan,a.status,a.
     </div>
     <span class="badge <?=strtolower($a['status'])?>"><?=e($a['status'])?></span>
   </a>
-
-  <div class="item-actions">
-    <a class="btn-edit-user"
-       href="edit_laporan.php?id=<?=(int)$a['id_aspirasi']?>">
-      &#9998; Edit
-    </a>
-    <button class="btn-hapus-user"
-      onclick="konfirmasiHapus(<?=(int)$a['id_aspirasi']?>,'<?=e(addslashes('#'.(int)$a['id_aspirasi'].' · '.$a['nama_kategori']))?>', '<?=e($a['status'])?>')">
-      &#128465; Hapus
-    </button>
-  </div>
 </div>
 <?php endwhile; mysqli_stmt_close($st); ?>
 
