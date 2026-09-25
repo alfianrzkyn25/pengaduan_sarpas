@@ -62,11 +62,6 @@ $r=mysqli_query($conn,"SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh) d
   <td><?=e($h['catatan']?:'-')?></td>
   <td><?=e($h['diubah_oleh'])?></td>
   <td><?=e(date('d-m-Y H:i',strtotime($h['waktu_ubah'])))?></td>
-  <td>
-    <button class="btn-hapus" onclick="konfirmasiHapus(<?=(int)$h['id_histori']?>)">
-      &#128465; Hapus
-    </button>
-  </td>
 </tr>
 <?php endwhile;?>
 </table></div></section>
