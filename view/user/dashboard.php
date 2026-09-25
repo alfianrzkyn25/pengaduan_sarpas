@@ -37,7 +37,7 @@ $r = mysqli_stmt_get_result($st);
             <li><a href="dashboard.php" class="active">Beranda</a></li>
             <li><a href="buat_pengaduan.php" class="">Buat Pengaduan</a></li>
             <li><a href="laporan_saya.php" class="">Laporan Saya</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>

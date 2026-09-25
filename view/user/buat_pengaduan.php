@@ -87,7 +87,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
             <li><a href="dashboard.php" class="">Beranda</a></li>
             <li><a href="buat_pengaduan.php" class="active">Buat Pengaduan</a></li>
             <li><a href="laporan_saya.php" class="">Laporan Saya</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>

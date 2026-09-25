@@ -20,7 +20,7 @@ function login_redirect_path() {
     $current = str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME']));
     $rel     = trim(str_replace($root, '', $current), '/');
     $depth   = $rel === '' ? 0 : substr_count($rel, '/') + 1;
-    return str_repeat('../', $depth) . 'login.php';
+    return str_repeat('../', $depth) . 'auth/login.php';
 }
 function require_login() { if (empty($_SESSION['role'])) redirect(login_redirect_path()); }
 function require_role($role) { require_login(); if ($_SESSION['role'] !== $role) redirect(login_redirect_path()); }

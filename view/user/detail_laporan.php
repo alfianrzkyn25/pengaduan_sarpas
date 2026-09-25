@@ -57,7 +57,7 @@ if ($a) {
             <li><a href="dashboard.php" class="">Beranda</a></li>
             <li><a href="buat_pengaduan.php" class="">Buat Pengaduan</a></li>
             <li><a href="laporan_saya.php" class="active">Laporan Saya</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>

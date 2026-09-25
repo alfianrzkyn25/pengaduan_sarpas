@@ -80,8 +80,8 @@ $categories = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori
             <li><a href="form_aspirasi.php" class="active">form aspirasi</a></li>
             <li><a href="histori.php" class="">Histori Laporan</a></li>
             <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="siswa.php">Kelola Siswa</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>

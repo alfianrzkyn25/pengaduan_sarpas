@@ -36,8 +36,8 @@ if (isset($st)) mysqli_stmt_close($st);
             <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
             <li><a href="histori.php" class="">Histori Laporan</a></li>
             <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="siswa.php">Kelola Siswa</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>

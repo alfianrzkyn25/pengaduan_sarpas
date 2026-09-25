@@ -172,8 +172,8 @@ if ($a && $a['status'] !== 'Ditolak') {
             <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
             <li><a href="histori.php" class="">Histori Laporan</a></li>
             <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="siswa.php">Kelola Siswa</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside><label for="menuToggle" class="sidebar-overlay"></label>

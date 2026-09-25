@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/../config/database.php';
 if (!empty($_SESSION['role'])) {
-  redirect($_SESSION['role'] === 'admin' ? 'view/admin/dashboard.php' : 'view/user/dashboard.php');
+  redirect($_SESSION['role'] === 'admin' ? '../view/admin/dashboard.php' : '../view/user/dashboard.php');
 }
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['role'] = 'admin';
       $_SESSION['id_admin'] = (int)$admin['id_admin'];
       $_SESSION['nama'] = $admin['nama'];
-      redirect('view/admin/dashboard.php');
+      redirect('../view/admin/dashboard.php');
     }
     $st = mysqli_prepare($conn, 'SELECT nis,nama,kelas,password FROM siswa WHERE nis=? LIMIT 1');
     mysqli_stmt_bind_param($st, 's', $login);
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['role'] = 'siswa';
       $_SESSION['nis'] = $siswa['nis'];
       $_SESSION['nama'] = $siswa['nama'];
-      redirect('view/user/dashboard.php');
+      redirect('../view/user/dashboard.php');
     }
     $error = 'Akun tidak ditemukan atau password salah.';
   }
@@ -49,7 +49,7 @@ $justRegistered = !empty($_GET['registered']);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Login - Pengaduan Sarpras</title>
-  <link rel="stylesheet" href="assets/auth.css">
+  <link rel="stylesheet" href="../assets/auth.css">
 </head>
 
 <body>

@@ -62,4 +62,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../view/auth/register.php';
+include __DIR__ . '/../auth/register.php';

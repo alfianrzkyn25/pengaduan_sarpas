@@ -24,8 +24,8 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
             <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
             <li><a href="histori.php" class="">Histori Laporan</a></li>
             <li><a href="kategori.php" class="active">Kategori Sarpras</a></li>
-            <li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../logout.php">Keluar</a></li>
+            <li><a href="siswa.php">Kelola Siswa</a></li>
+            <li><a href="../../auth/logout.php">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>
