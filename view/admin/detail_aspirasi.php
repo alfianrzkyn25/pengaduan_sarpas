@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
-require_role('admin'); $user=current_user(); $id=(int)($_GET['id']??0); $error=''; $ok='';
+require_role('admin');
+$user = current_user();
+$id = (int)($_GET['id'] ?? 0);
+$error = '';
+$ok = '';
 
 // Urutan status yang wajib diikuti (tidak boleh mundur/meloncat).
 $urutanStatus = ['Menunggu', 'Proses', 'Selesai'];
@@ -50,7 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $st = mysqli_prepare($conn, 'UPDATE aspirasi SET status=?, feedback=? WHERE id_aspirasi=?');
         mysqli_stmt_bind_param($st, 'ssi', $status, $feedback, $id);
         $okq = mysqli_stmt_execute($st);
-        if (!$okq) { $error = 'Gagal memperbarui status aspirasi: ' . mysqli_stmt_error($st); }
+        if (!$okq) {
+            $error = 'Gagal memperbarui status aspirasi: ' . mysqli_stmt_error($st);
+        }
         mysqli_stmt_close($st);
 
         if ($okq) {
@@ -79,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $by = $user['nama'] ?? 'admin';
             mysqli_stmt_bind_param($st, 'iissss', $id, $adminId, $old['status'], $status, $note, $by);
             $okq = mysqli_stmt_execute($st);
-            if (!$okq) { $error = 'Gagal menyimpan riwayat status: ' . mysqli_stmt_error($st); }
+            if (!$okq) {
+                $error = 'Gagal menyimpan riwayat status: ' . mysqli_stmt_error($st);
+            }
             mysqli_stmt_close($st);
         }
 
@@ -109,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_GET['updated'])) $ok = 'Status dan feedback berhasil diperbarui.';
 
-$a = null; $hist = [];
+$a = null;
+$hist = [];
 $st = mysqli_prepare($conn, 'SELECT a.*,s.nama AS nama_siswa,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=?');
 mysqli_stmt_bind_param($st, 'i', $id);
 mysqli_stmt_execute($st);
@@ -144,4 +153,63 @@ if ($a && $a['status'] !== 'Ditolak') {
     if ($a['status'] !== 'Selesai') $opsiStatus[] = 'Ditolak';
 }
 ?>
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detail Aspirasi</title><link rel="stylesheet" href="../../assets/admin.css"></head><body><input type="checkbox" id="menuToggle" class="menu-toggle"><aside class="sidebar" id="sidebar"><div class="sidebar-header">Pengaduan Sarpras</div><ul><li><a href="dashboard.php" class="">Dashboard</a></li><li><a href="aspirasi.php" class="active">Data Aspirasi</a></li><li><a href="form_aspirasi.php" class="">form aspirasi</a></li><li><a href="histori.php" class="">Histori Laporan</a></li><li><a href="kategori.php" class="">Kategori Sarpras</a></li><li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li><li><a href="../../logout.php">Keluar</a></li></ul><div class="admin-user"><strong><?=e($user["nama"]??"Admin")?></strong>Administrator</div></aside><label for="menuToggle" class="sidebar-overlay"></label><div class="main-content"><header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label><h1>Detail Aspirasi</h1></header><main class="content-area"><?php if($error):?><div class="alert error"><?=e($error)?></div><?php endif;?><?php if($ok):?><div class="alert success"><?=e($ok)?></div><?php endif;?><?php if(!$a):?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="aspirasi.php">Kembali</a><?php else:?><div class="heading"><div><p class="eyebrow">Aspirasi #<?=$a['id_aspirasi']?></p><h1><?=e($a['nama_kategori'])?></h1><p class="muted"><?=e($a['nama_siswa'])?> · <?=e($a['nis'])?></p></div><span class="badge <?=strtolower($a['status'])?>"><?=e($a['status'])?></span></div><?php if($a['status']==='Ditolak'):?><div class="alert error" style="margin-top:-8px">Aspirasi ini telah <b>ditolak</b> dan statusnya terkunci (tidak dapat diubah lagi). Alasan: <?=e($a['feedback']?:'-')?></div><?php endif;?><div class="detail"><section class="panel"><h2>Detail Laporan</h2><p><b>Pelapor</b><?=e($a['nama_siswa'])?> · <?=e($a['kelas'])?></p><p><b>Lokasi</b><?=e($a['lokasi'])?></p><p><b>Keterangan</b><?=e($a['keterangan'])?></p><p><b>Feedback</b><?=e($a['feedback']?:'-')?></p><p><b>Dibuat</b><?=e($a['tanggal'])?></p><?php if($lampiran):?><div style="margin-top:10px"><b>Foto Lampiran</b><div class="lampiran-grid"><?php foreach($lampiran as $lf):?><a href="../../<?=e($lf['url_file'])?>" target="_blank"><img src="../../<?=e($lf['url_file'])?>" alt="<?=e($lf['nama_file'])?>"></a><?php endforeach;?></div></div><?php endif;?></section><section class="panel"><h2>Perbarui Status</h2><?php if($a['status']==='Ditolak'):?><p class="muted">Aspirasi ini sudah ditolak. Status terkunci dan tidak bisa diubah lagi.</p><?php else:?><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status <span style="color:#6b7280;font-weight:400">(urut: Menunggu → Proses → Selesai)</span><select name="status" id="statusSelect"><?php foreach($opsiStatus as $opt):?><option value="<?=$opt?>" <?=$a['status']===$opt?'selected':''?>><?=$opt?></option><?php endforeach;?></select></label><label>Feedback <span style="color:#6b7280;font-weight:400">(opsional)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?=e($a['feedback']??'')?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form><?php endif;?></section></div><section class="panel"><h2>Riwayat</h2><div class="timeline"><?php foreach($hist as $h):?><div class="timeline-item"><b><?=e($h['status_baru'])?></b><small><?=e($h['waktu_ubah'])?> · <?=e($h['diubah_oleh'])?></small><div><?=e($h['catatan']?:'-')?></div></div><?php endforeach;?></div></section><a class="btn secondary" href="aspirasi.php">← Kembali</a><?php endif;?></main></div></body></html>
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Detail Aspirasi</title>
+    <link rel="stylesheet" href="../../assets/admin.css">
+</head>
+
+<body><input type="checkbox" id="menuToggle" class="menu-toggle">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">Pengaduan Sarpras</div>
+        <ul>
+            <li><a href="dashboard.php" class="">Dashboard</a></li>
+            <li><a href="aspirasi.php" class="active">Data Aspirasi</a></li>
+            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
+            <li><a href="histori.php" class="">Histori Laporan</a></li>
+            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
+            <li><a href="../../controller/c_siswa.php">Kelola Siswa</a></li>
+            <li><a href="../../logout.php">Keluar</a></li>
+        </ul>
+        <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
+    </aside><label for="menuToggle" class="sidebar-overlay"></label>
+    <div class="main-content">
+        <header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label>
+            <h1>Detail Aspirasi</h1>
+        </header>
+        <main class="content-area"><?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><?php if ($ok): ?><div class="alert success"><?= e($ok) ?></div><?php endif; ?><?php if (!$a): ?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="aspirasi.php">Kembali</a><?php else: ?><div class="heading">
+                    <div>
+                        <p class="eyebrow">Aspirasi #<?= $a['id_aspirasi'] ?></p>
+                        <h1><?= e($a['nama_kategori']) ?></h1>
+                        <p class="muted"><?= e($a['nama_siswa']) ?> · <?= e($a['nis']) ?></p>
+                    </div><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span>
+                </div><?php if ($a['status'] === 'Ditolak'): ?><div class="alert error" style="margin-top:-8px">Aspirasi ini telah <b>ditolak</b> dan statusnya terkunci (tidak dapat diubah lagi). Alasan: <?= e($a['feedback'] ?: '-') ?></div><?php endif; ?><div class="detail">
+                    <section class="panel">
+                        <h2>Detail Laporan</h2>
+                        <p><b>Pelapor</b><?= e($a['nama_siswa']) ?> · <?= e($a['kelas']) ?></p>
+                        <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
+                        <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
+                        <p><b>Feedback</b><?= e($a['feedback'] ?: '-') ?></p>
+                        <p><b>Dibuat</b><?= e($a['tanggal']) ?></p><?php if ($lampiran): ?><div style="margin-top:10px"><b>Foto Lampiran</b>
+                                <div class="lampiran-grid"><?php foreach ($lampiran as $lf): ?><a href="../../<?= e($lf['url_file']) ?>" target="_blank"><img src="../../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                            </div><?php endif; ?>
+                    </section>
+                    <section class="panel">
+                        <h2>Perbarui Status</h2><?php if ($a['status'] === 'Ditolak'): ?><p class="muted">Aspirasi ini sudah ditolak. Status terkunci dan tidak bisa diubah lagi.</p><?php else: ?><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status <span style="color:#6b7280;font-weight:400">(urut: Menunggu → Proses → Selesai)</span><select name="status" id="statusSelect"><?php foreach ($opsiStatus as $opt): ?><option value="<?= $opt ?>" <?= $a['status'] === $opt ? 'selected' : '' ?>><?= $opt ?></option><?php endforeach; ?></select></label><label>Feedback <span style="color:#6b7280;font-weight:400">(opsional)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?= e($a['feedback'] ?? '') ?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form><?php endif; ?>
+                    </section>
+                </div>
+                <section class="panel">
+                    <h2>Riwayat</h2>
+                    <div class="timeline"><?php foreach ($hist as $h): ?><div class="timeline-item"><b><?= e($h['status_baru']) ?></b><small><?= e($h['waktu_ubah']) ?> · <?= e($h['diubah_oleh']) ?></small>
+                                <div><?= e($h['catatan'] ?: '-') ?></div>
+                            </div><?php endforeach; ?></div>
+                </section><a class="btn secondary" href="aspirasi.php">← Kembali</a><?php endif; ?>
+        </main>
+    </div>
+</body>
+
+</html>
