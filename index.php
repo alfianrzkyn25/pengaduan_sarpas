@@ -2,7 +2,7 @@
 require_once __DIR__ . '/config/database.php';
 
 if (!empty($_SESSION['role'])) {
-    redirect($_SESSION['role'] === 'admin' ? 'view/admin/dashboard.php' : 'view/user/dashboard.php');
+    redirect($_SESSION['role'] === 'admin' ? url('admin/dashboard') : url('user/dashboard'));
 }
 
-redirect('auth/login.php');
+redirect(url('auth/login'));

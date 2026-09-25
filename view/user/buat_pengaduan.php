@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         mysqli_stmt_close($lp);
                     }
                 }
-                redirect('detail_laporan.php?id=' . $id . '&saved=1');
+                redirect(url('user/detail_laporan') . '?id=' . $id . '&saved=1');
             }
             mysqli_rollback($conn);
             $error = 'Pengaduan gagal disimpan: ' . mysqli_error($conn);
@@ -75,7 +75,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Buat Pengaduan</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -84,10 +84,10 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <div class="sidebar-sub">Portal Siswa</div>
         <ul>
-            <li><a href="dashboard.php" class="">Beranda</a></li>
-            <li><a href="buat_pengaduan.php" class="active">Buat Pengaduan</a></li>
-            <li><a href="laporan_saya.php" class="">Laporan Saya</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('user/dashboard')) ?>" class="">Beranda</a></li>
+            <li><a href="<?= e(url('user/buat_pengaduan')) ?>" class="active">Buat Pengaduan</a></li>
+            <li><a href="<?= e(url('user/laporan_saya')) ?>" class="">Laporan Saya</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>
@@ -107,7 +107,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
                     <label>Lokasi<input name="lokasi" maxlength="50" required placeholder="Contoh: Ruang XII RPL 1"></label>
                     <label>Keterangan<textarea name="keterangan" maxlength="255" required placeholder="Jelaskan kerusakan atau masalah..."></textarea></label>
                     <label>Foto Lampiran (opsional)<input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label>
-                    <div><button class="btn" type="submit">Kirim Pengaduan</button> <a class="btn secondary" href="dashboard.php">Batal</a></div>
+                    <div><button class="btn" type="submit">Kirim Pengaduan</button> <a class="btn secondary" href="<?= e(url('user/dashboard')) ?>">Batal</a></div>
                 </form>
             </section>
         </main>

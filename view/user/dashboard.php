@@ -25,7 +25,7 @@ $r = mysqli_stmt_get_result($st);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Dashboard Siswa</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -34,10 +34,10 @@ $r = mysqli_stmt_get_result($st);
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <div class="sidebar-sub">Portal Siswa</div>
         <ul>
-            <li><a href="dashboard.php" class="active">Beranda</a></li>
-            <li><a href="buat_pengaduan.php" class="">Buat Pengaduan</a></li>
-            <li><a href="laporan_saya.php" class="">Laporan Saya</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('user/dashboard')) ?>" class="active">Beranda</a></li>
+            <li><a href="<?= e(url('user/buat_pengaduan')) ?>" class="">Buat Pengaduan</a></li>
+            <li><a href="<?= e(url('user/laporan_saya')) ?>" class="">Laporan Saya</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>
@@ -52,7 +52,7 @@ $r = mysqli_stmt_get_result($st);
                     <p class="eyebrow">Portal Siswa</p>
                     <h1>Halo, <?= e($user['nama']) ?> 👋</h1>
                     <p class="muted">Kelola pengaduan sarana dan lihat perkembangan laporanmu.</p>
-                </div><a class="btn" href="buat_pengaduan.php">+ Buat Pengaduan</a>
+                </div><a class="btn" href="<?= e(url('user/buat_pengaduan')) ?>">+ Buat Pengaduan</a>
             </div>
             <div class="grid">
                 <div class="card stat"><span>Total Laporan</span><strong><?= $stats['total'] ?></strong></div>
@@ -63,9 +63,9 @@ $r = mysqli_stmt_get_result($st);
             </div>
             <section class="panel">
                 <div class="panel-head">
-                    <h2>Laporan Terbaru</h2><a href="laporan_saya.php">Lihat semua</a>
+                    <h2>Laporan Terbaru</h2><a href="<?= e(url('user/laporan_saya')) ?>">Lihat semua</a>
                 </div>
-                <div class="list"><?php while ($a = mysqli_fetch_assoc($r)): ?><a class="item" href="detail_laporan.php?id=<?= (int)$a['id_aspirasi'] ?>">
+                <div class="list"><?php while ($a = mysqli_fetch_assoc($r)): ?><a class="item" href="<?= e(url('user/detail_laporan')) ?>?id=<?= (int)$a['id_aspirasi'] ?>">
                             <div><b>#<?= (int)$a['id_aspirasi'] ?> · <?= e($a['nama_kategori']) ?></b><span><?= e($a['lokasi']) ?></span><small><?= e($a['keterangan']) ?></small></div><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span>
                         </a><?php endwhile;
                                     mysqli_stmt_close($st); ?></div>

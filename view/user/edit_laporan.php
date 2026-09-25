@@ -14,10 +14,10 @@ $a = mysqli_fetch_assoc(mysqli_stmt_get_result($st));
 mysqli_stmt_close($st);
 
 if (!$a) {
-  redirect('laporan_saya.php');
+  redirect(url('user/laporan_saya'));
 }
 if ($a['status'] !== 'Menunggu') {
-  redirect('laporan_saya.php?error_edit=1');
+  redirect(url('user/laporan_saya') . '?error_edit=1');
 }
 
 // Handle POST (simpan perubahan)
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           mysqli_stmt_close($lp);
         }
       }
-      redirect('laporan_saya.php?edited=1');
+      redirect(url('user/laporan_saya') . '?edited=1');
     }
     $error = 'Gagal menyimpan perubahan: ' . mysqli_error($conn);
   }
@@ -95,7 +95,7 @@ mysqli_stmt_close($st);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Edit Laporan #<?= (int)$a['id_aspirasi'] ?></title>
-  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
   <style>
     .alert.error {
       background: #fef2f2;
@@ -179,10 +179,10 @@ mysqli_stmt_close($st);
     <div class="sidebar-header">Pengaduan Sarpras</div>
     <div class="sidebar-sub">Portal Siswa</div>
     <ul>
-      <li><a href="dashboard.php">Beranda</a></li>
-      <li><a href="buat_pengaduan.php">Buat Pengaduan</a></li>
-      <li><a href="laporan_saya.php" class="active">Laporan Saya</a></li>
-      <li><a href="../../auth/logout.php">Keluar</a></li>
+      <li><a href="<?= e(url('user/dashboard')) ?>">Beranda</a></li>
+      <li><a href="<?= e(url('user/buat_pengaduan')) ?>">Buat Pengaduan</a></li>
+      <li><a href="<?= e(url('user/laporan_saya')) ?>" class="active">Laporan Saya</a></li>
+      <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
     </ul>
     <div class="admin-user"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa</div>
   </aside>
@@ -230,10 +230,10 @@ mysqli_stmt_close($st);
             <div class="lampiran-list">
               <?php foreach ($lampiran as $lf): ?>
                 <div class="lampiran-item">
-                  <a href="../../<?= e($lf['url_file']) ?>" target="_blank" title="<?= e($lf['nama_file']) ?>">
+                  <a href="<?= e($base) ?>/<?= e($lf['url_file']) ?>" target="_blank" title="<?= e($lf['nama_file']) ?>">
                     &#128247; <?= e($lf['nama_file']) ?>
                   </a>
-                  <form method="POST" action="../../controller/c_hapus_lampiran.php" style="display:inline">
+                  <form method="POST" action="<?= e($base) ?>/controller/c_hapus_lampiran.php" style="display:inline">
                     <input type="hidden" name="id_lampiran" value="<?= (int)$lf['id_lampiran'] ?>">
                     <input type="hidden" name="id_aspirasi" value="<?= (int)$a['id_aspirasi'] ?>">
                     <button type="submit" class="btn-hapus-foto" title="Hapus foto ini">&times;</button>
@@ -250,7 +250,7 @@ mysqli_stmt_close($st);
 
           <div>
             <button class="btn" type="submit">&#10003; Simpan Perubahan</button>
-            <a class="btn secondary" href="laporan_saya.php">Batal</a>
+            <a class="btn secondary" href="<?= e(url('user/laporan_saya')) ?>">Batal</a>
           </div>
         </form>
       </section>

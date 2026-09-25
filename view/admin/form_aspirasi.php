@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            redirect('detail_aspirasi.php?id=' . $id . '&saved=1');
+            redirect(url('admin/detail_aspirasi') . '?id=' . $id . '&saved=1');
         }
         $error = 'Data gagal disimpan: ' . mysqli_error($conn);
     }
@@ -67,7 +67,7 @@ $categories = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Form Aspirasi</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -75,13 +75,13 @@ $categories = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <ul>
-            <li><a href="dashboard.php" class="">Dashboard</a></li>
-            <li><a href="aspirasi.php" class="">Data Aspirasi</a></li>
-            <li><a href="form_aspirasi.php" class="active">form aspirasi</a></li>
-            <li><a href="histori.php" class="">Histori Laporan</a></li>
-            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('admin/dashboard')) ?>" class="">Dashboard</a></li>
+            <li><a href="<?= e(url('admin/aspirasi')) ?>" class="">Data Aspirasi</a></li>
+            <li><a href="<?= e(url('admin/form_aspirasi')) ?>" class="active">form aspirasi</a></li>
+            <li><a href="<?= e(url('admin/histori')) ?>" class="">Histori Laporan</a></li>
+            <li><a href="<?= e(url('admin/kategori')) ?>" class="">Kategori Sarpras</a></li>
+            <li><a href="<?= e(url('admin/siswa')) ?>">Kelola Siswa</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>
@@ -104,7 +104,7 @@ $categories = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori
                     <label>Lokasi<input name="lokasi" maxlength="50" required placeholder="Contoh: Ruang XII RPL 1"></label>
                     <label>Keterangan<textarea name="keterangan" maxlength="255" required placeholder="Jelaskan kerusakan atau masalah..."></textarea></label>
                     <label>Foto (opsional)<input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label>
-                    <div><button class="btn" type="submit">Kirim Pengaduan</button> <a class="btn secondary" href="aspirasi.php">Batal</a></div>
+                    <div><button class="btn" type="submit">Kirim Pengaduan</button> <a class="btn secondary" href="<?= e(url('admin/aspirasi')) ?>">Batal</a></div>
                 </form>
             </section>
         </main>

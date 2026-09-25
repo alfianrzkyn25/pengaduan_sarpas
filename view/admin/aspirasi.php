@@ -23,7 +23,7 @@ if (isset($st)) mysqli_stmt_close($st);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Data Aspirasi</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -31,13 +31,13 @@ if (isset($st)) mysqli_stmt_close($st);
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <ul>
-            <li><a href="dashboard.php" class="">Dashboard</a></li>
-            <li><a href="aspirasi.php" class="active">Data Aspirasi</a></li>
-            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
-            <li><a href="histori.php" class="">Histori Laporan</a></li>
-            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('admin/dashboard')) ?>" class="">Dashboard</a></li>
+            <li><a href="<?= e(url('admin/aspirasi')) ?>" class="active">Data Aspirasi</a></li>
+            <li><a href="<?= e(url('admin/form_aspirasi')) ?>" class="">form aspirasi</a></li>
+            <li><a href="<?= e(url('admin/histori')) ?>" class="">Histori Laporan</a></li>
+            <li><a href="<?= e(url('admin/kategori')) ?>" class="">Kategori Sarpras</a></li>
+            <li><a href="<?= e(url('admin/siswa')) ?>">Kelola Siswa</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>
@@ -50,7 +50,7 @@ if (isset($st)) mysqli_stmt_close($st);
             <section class="panel">
                 <div class="toolbar">
                     <form class="search" method="get"><input name="q" value="<?= e($q) ?>" placeholder="Cari NIS, nama, lokasi, status..."><button class="btn" type="submit">Cari</button></form>
-                    <a class="btn" href="form_aspirasi.php">+ Tambah Aspirasi</a>
+                    <a class="btn" href="<?= e(url('admin/form_aspirasi')) ?>">+ Tambah Aspirasi</a>
                 </div>
                 <h2 style="margin-top:0">Daftar Aspirasi</h2>
                 <div style="overflow:auto">
@@ -76,7 +76,7 @@ if (isset($st)) mysqli_stmt_close($st);
                                 <td><?= e($a['keterangan']) ?></td>
                                 <td><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span></td>
                                 <td><?= e($a['feedback'] ?: '-') ?></td>
-                                <td><a class="btn" href="detail_aspirasi.php?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
+                                <td><a class="btn" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>

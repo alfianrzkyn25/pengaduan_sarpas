@@ -18,7 +18,7 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Dashboard Utama</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -26,13 +26,13 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <ul>
-            <li><a href="dashboard.php" class="active">Dashboard</a></li>
-            <li><a href="aspirasi.php" class="">Data Aspirasi</a></li>
-            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
-            <li><a href="histori.php" class="">Histori Laporan</a></li>
-            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('admin/dashboard')) ?>" class="active">Dashboard</a></li>
+            <li><a href="<?= e(url('admin/aspirasi')) ?>" class="">Data Aspirasi</a></li>
+            <li><a href="<?= e(url('admin/form_aspirasi')) ?>" class="">form aspirasi</a></li>
+            <li><a href="<?= e(url('admin/histori')) ?>" class="">Histori Laporan</a></li>
+            <li><a href="<?= e(url('admin/kategori')) ?>" class="">Kategori Sarpras</a></li>
+            <li><a href="<?= e(url('admin/siswa')) ?>">Kelola Siswa</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>
@@ -51,7 +51,7 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
             </div>
             <section class="panel">
                 <div class="panel-head">
-                    <h2>5 Aspirasi Terbaru</h2><a href="aspirasi.php">Kelola semua</a>
+                    <h2>5 Aspirasi Terbaru</h2><a href="<?= e(url('admin/aspirasi')) ?>">Kelola semua</a>
                 </div>
                 <div style="overflow:auto">
                     <table class="table">
@@ -74,7 +74,7 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
                                 <td><?= e($a['keterangan']) ?></td>
                                 <td><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span></td>
                                 <td><?= e(date('d-m-Y H:i', strtotime($a['tanggal']))) ?></td>
-                                <td><a class="btn" href="detail_aspirasi.php?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
+                                <td><a class="btn" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
                             </tr>
                         <?php endwhile; ?>
                     </table>

@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_close($st);
 
                 if ($ok) {
-                    redirect('siswa.php?msg=added');
+                    redirect(url('admin/siswa?msg=added'));
                 }
                 $error = 'Gagal menambah siswa: ' . $dbError;
             }
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // affected_rows = 0 tetap dianggap berhasil apabila data memang sama.
                 if ($ok) {
-                    redirect('siswa.php?msg=updated');
+                    redirect(url('admin/siswa?msg=updated'));
                 }
                 $error = 'Gagal memperbarui siswa: ' . $dbError;
             }
@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_close($st);
 
                 if ($ok && $affected > 0) {
-                    redirect('siswa.php?msg=deleted');
+                    redirect(url('admin/siswa?msg=deleted'));
                 }
                 $error = 'Data siswa gagal dihapus' . ($dbError ? ': ' . $dbError : '.');
             }
@@ -224,8 +224,6 @@ while ($row = mysqli_fetch_assoc($res)) {
     $rows[] = $row;
 }
 if (isset($st) && $st instanceof mysqli_stmt) mysqli_stmt_close($st);
-
-$base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
 ?>
 <!doctype html>
 <html lang="id">
@@ -242,13 +240,13 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">Pengaduan Sarpras</div>
     <ul>
-      <li><a href="<?= e($base) ?>/view/admin/dashboard.php">Dashboard</a></li>
-      <li><a href="<?= e($base) ?>/view/admin/aspirasi.php">Data Aspirasi</a></li>
-      <li><a href="<?= e($base) ?>/view/admin/form_aspirasi.php">Form Aspirasi</a></li>
-      <li><a href="<?= e($base) ?>/view/admin/histori.php">Histori Laporan</a></li>
-      <li><a href="<?= e($base) ?>/view/admin/kategori.php">Kategori Sarpras</a></li>
-      <li><a href="<?= e($base) ?>/view/admin/siswa.php" class="active">Kelola Siswa</a></li>
-      <li><a href="<?= e($base) ?>/auth/logout.php">Keluar</a></li>
+      <li><a href="<?= e(url('admin/dashboard')) ?>">Dashboard</a></li>
+      <li><a href="<?= e(url('admin/aspirasi')) ?>">Data Aspirasi</a></li>
+      <li><a href="<?= e(url('admin/form_aspirasi')) ?>">Form Aspirasi</a></li>
+      <li><a href="<?= e(url('admin/histori')) ?>">Histori Laporan</a></li>
+      <li><a href="<?= e(url('admin/kategori')) ?>">Kategori Sarpras</a></li>
+      <li><a href="<?= e(url('admin/siswa')) ?>" class="active">Kelola Siswa</a></li>
+      <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
     </ul>
     <div class="admin-user"><strong><?= e($user['nama'] ?? 'Admin') ?></strong>Administrator</div>
   </aside>
@@ -267,7 +265,7 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
           <h1>Data Siswa</h1>
           <p class="muted">Tambah, ubah, dan hapus akun siswa dari satu halaman.</p>
         </div>
-        <a class="btn" href="<?= e($base) ?>/view/admin/siswa.php?action=baru">+ Tambah Siswa</a>
+        <a class="btn" href="<?= e(url('admin/siswa')) ?>?action=baru">+ Tambah Siswa</a>
       </div>
 
       <?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?>
@@ -277,7 +275,7 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
         <section class="panel siswa-form-panel">
           <div class="panel-head">
             <h2><?= $editing ? 'Edit Data Siswa' : 'Tambah Siswa' ?></h2>
-            <a href="<?= e($base) ?>/view/admin/siswa.php">Tutup</a>
+            <a href="<?= e(url('admin/siswa')) ?>">Tutup</a>
           </div>
           <form method="post" class="admin-form">
             <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
@@ -299,7 +297,7 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
               </label>
             </div>
             <div class="form-actions">
-              <a class="btn secondary" href="<?= e($base) ?>/view/admin/siswa.php">Batal</a>
+              <a class="btn secondary" href="<?= e(url('admin/siswa')) ?>">Batal</a>
               <button class="btn" type="submit"><?= $editing ? 'Simpan Perubahan' : 'Tambah Siswa' ?></button>
             </div>
           </form>
@@ -311,7 +309,7 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
           <form class="search" method="get">
             <input name="q" value="<?= e($q) ?>" placeholder="Cari NIS, nama, atau kelas...">
             <button class="btn" type="submit">Cari</button>
-            <?php if ($q !== ''): ?><a class="btn secondary" href="<?= e($base) ?>/view/admin/siswa.php">Reset</a><?php endif; ?>
+            <?php if ($q !== ''): ?><a class="btn secondary" href="<?= e(url('admin/siswa')) ?>">Reset</a><?php endif; ?>
           </form>
           <div class="siswa-total"><strong><?= count($rows) ?></strong><span>siswa ditampilkan</span></div>
         </div>
@@ -350,8 +348,8 @@ $base = $base ?? rtrim(dirname(dirname(dirname($_SERVER['SCRIPT_NAME']))), '/');
                     <td><span class="count-pill"><?= e($s['jumlah_laporan']) ?></span></td>
                     <td>
                       <div class="action-group">
-                        <a class="btn small" href="<?= e($base) ?>/view/admin/siswa.php?edit=<?= urlencode($s['nis']) ?>">Edit</a>
-                        <form method="post" action="<?= e($base) ?>/view/admin/siswa.php" onsubmit="return confirm('Yakin ingin menghapus siswa <?= e($s['nama']) ?> (<?= e($s['nis']) ?>)?');">
+                        <a class="btn small" href="<?= e(url('admin/siswa')) ?>?edit=<?= urlencode($s['nis']) ?>">Edit</a>
+                        <form method="post" action="<?= e(url('admin/siswa')) ?>" onsubmit="return confirm('Yakin ingin menghapus siswa <?= e($s['nama']) ?> (<?= e($s['nis']) ?>)?');">
                           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
                           <input type="hidden" name="action" value="hapus">
                           <input type="hidden" name="nis" value="<?= e($s['nis']) ?>">

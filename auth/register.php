@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/database.php';
 
 if (!empty($_SESSION['role'])) {
-    redirect($_SESSION['role'] === 'admin' ? '../view/admin/dashboard.php' : '../view/user/dashboard.php');
+    redirect($_SESSION['role'] === 'admin' ? url('admin/dashboard') : url('user/dashboard'));
 }
 
 $error = '';
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_close($stmt);
 
             if ($ok) {
-                redirect('login.php?registered=1');
+                redirect(url('auth/login') . '?registered=1');
             }
             $error = 'Registrasi gagal disimpan: ' . mysqli_error($conn);
         }
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Daftar Akun Siswa - Pengaduan Sarpras</title>
-<link rel="stylesheet" href="../assets/auth.css">
+<link rel="stylesheet" href="<?= e($base) ?>/assets/auth.css">
 </head>
 <body>
 <main class="auth-wrap">
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-form-panel">
       <div class="form-head">
         <h2>Daftar Akun Siswa</h2>
-        <p>Sudah punya akun? <a href="login.php">Masuk di sini</a></p>
+        <p>Sudah punya akun? <a href="<?= e(url('auth/login')) ?>">Masuk di sini</a></p>
       </div>
 
       <?php if ($error): ?>

@@ -45,7 +45,7 @@ if ($a) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Detail Laporan</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -54,10 +54,10 @@ if ($a) {
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <div class="sidebar-sub">Portal Siswa</div>
         <ul>
-            <li><a href="dashboard.php" class="">Beranda</a></li>
-            <li><a href="buat_pengaduan.php" class="">Buat Pengaduan</a></li>
-            <li><a href="laporan_saya.php" class="active">Laporan Saya</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('user/dashboard')) ?>" class="">Beranda</a></li>
+            <li><a href="<?= e(url('user/buat_pengaduan')) ?>" class="">Buat Pengaduan</a></li>
+            <li><a href="<?= e(url('user/laporan_saya')) ?>" class="active">Laporan Saya</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
     </aside>
@@ -68,7 +68,7 @@ if ($a) {
         </header>
         <main class="content-area">
             <?php if ($saved): ?><div class="alert success">Pengaduan berhasil dikirim.</div><?php endif; ?>
-            <?php if (!$a): ?><div class="alert error">Laporan tidak ditemukan.</div><a class="btn" href="laporan_saya.php">Kembali</a><?php else: ?>
+            <?php if (!$a): ?><div class="alert error">Laporan tidak ditemukan.</div><a class="btn" href="<?= e(url('user/laporan_saya')) ?>">Kembali</a><?php else: ?>
                 <div class="heading">
                     <div>
                         <p class="eyebrow">Laporan #<?= (int)$a['id_aspirasi'] ?></p>
@@ -83,7 +83,7 @@ if ($a) {
                         <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
                         <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
                         <?php if ($fotoPengaduan): ?><div style="margin-top:10px"><b>Foto Pengaduan</b>
-                                <div class="lampiran-grid"><?php foreach ($fotoPengaduan as $lf): ?><a href="../../<?= e($lf['url_file']) ?>" target="_blank"><img src="../../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                                <div class="lampiran-grid"><?php foreach ($fotoPengaduan as $lf): ?><a href="<?= e($base) ?>/<?= e($lf['url_file']) ?>" target="_blank"><img src="<?= e($base) ?>/<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
                             </div><?php endif; ?>
                     </section>
                     <section class="panel">
@@ -101,10 +101,10 @@ if ($a) {
                         <p class="muted" style="margin:0 0 <?= $fotoFeedback ? '14px' : '0' ?>">Belum ada feedback dari admin.</p>
                     <?php endif; ?>
                     <?php if ($fotoFeedback): ?><div><b>Foto Bukti Perbaikan</b>
-                            <div class="lampiran-grid"><?php foreach ($fotoFeedback as $lf): ?><a href="../../<?= e($lf['url_file']) ?>" target="_blank"><img src="../../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                            <div class="lampiran-grid"><?php foreach ($fotoFeedback as $lf): ?><a href="<?= e($base) ?>/<?= e($lf['url_file']) ?>" target="_blank"><img src="<?= e($base) ?>/<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
                         </div><?php endif; ?>
                 </section>
-                <a class="btn secondary" href="laporan_saya.php">← Kembali</a>
+                <a class="btn secondary" href="<?= e(url('user/laporan_saya')) ?>">← Kembali</a>
             <?php endif; ?>
         </main>
     </div>

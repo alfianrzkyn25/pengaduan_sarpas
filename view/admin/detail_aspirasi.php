@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     mysqli_stmt_close($lp);
                 }
             }
-            redirect('detail_aspirasi.php?id=' . $id . '&updated=1');
+            redirect(url('admin/detail_aspirasi') . '?id=' . $id . '&updated=1');
         }
         mysqli_rollback($conn);
         if ($error === '') {
@@ -160,20 +160,20 @@ if ($a && $a['status'] !== 'Ditolak') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Detail Aspirasi</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body><input type="checkbox" id="menuToggle" class="menu-toggle">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <ul>
-            <li><a href="dashboard.php" class="">Dashboard</a></li>
-            <li><a href="aspirasi.php" class="active">Data Aspirasi</a></li>
-            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
-            <li><a href="histori.php" class="">Histori Laporan</a></li>
-            <li><a href="kategori.php" class="">Kategori Sarpras</a></li>
-            <li><a href="siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('admin/dashboard')) ?>" class="">Dashboard</a></li>
+            <li><a href="<?= e(url('admin/aspirasi')) ?>" class="active">Data Aspirasi</a></li>
+            <li><a href="<?= e(url('admin/form_aspirasi')) ?>" class="">form aspirasi</a></li>
+            <li><a href="<?= e(url('admin/histori')) ?>" class="">Histori Laporan</a></li>
+            <li><a href="<?= e(url('admin/kategori')) ?>" class="">Kategori Sarpras</a></li>
+            <li><a href="<?= e(url('admin/siswa')) ?>">Kelola Siswa</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside><label for="menuToggle" class="sidebar-overlay"></label>
@@ -181,7 +181,7 @@ if ($a && $a['status'] !== 'Ditolak') {
         <header class="topbar"><label for="menuToggle" class="menu-icon">&#9776;</label>
             <h1>Detail Aspirasi</h1>
         </header>
-        <main class="content-area"><?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><?php if ($ok): ?><div class="alert success"><?= e($ok) ?></div><?php endif; ?><?php if (!$a): ?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="aspirasi.php">Kembali</a><?php else: ?><div class="heading">
+        <main class="content-area"><?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?><?php if ($ok): ?><div class="alert success"><?= e($ok) ?></div><?php endif; ?><?php if (!$a): ?><div class="alert error">Data aspirasi tidak ditemukan.</div><a class="btn" href="<?= e(url('admin/aspirasi')) ?>">Kembali</a><?php else: ?><div class="heading">
                     <div>
                         <p class="eyebrow">Aspirasi #<?= $a['id_aspirasi'] ?></p>
                         <h1><?= e($a['nama_kategori']) ?></h1>
@@ -195,7 +195,7 @@ if ($a && $a['status'] !== 'Ditolak') {
                         <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
                         <p><b>Feedback</b><?= e($a['feedback'] ?: '-') ?></p>
                         <p><b>Dibuat</b><?= e($a['tanggal']) ?></p><?php if ($lampiran): ?><div style="margin-top:10px"><b>Foto Lampiran</b>
-                                <div class="lampiran-grid"><?php foreach ($lampiran as $lf): ?><a href="../../<?= e($lf['url_file']) ?>" target="_blank"><img src="../../<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
+                                <div class="lampiran-grid"><?php foreach ($lampiran as $lf): ?><a href="<?= e($base) ?>/<?= e($lf['url_file']) ?>" target="_blank"><img src="<?= e($base) ?>/<?= e($lf['url_file']) ?>" alt="<?= e($lf['nama_file']) ?>"></a><?php endforeach; ?></div>
                             </div><?php endif; ?>
                     </section>
                     <section class="panel">
@@ -207,7 +207,7 @@ if ($a && $a['status'] !== 'Ditolak') {
                     <div class="timeline"><?php foreach ($hist as $h): ?><div class="timeline-item"><b><?= e($h['status_baru']) ?></b><small><?= e($h['waktu_ubah']) ?> · <?= e($h['diubah_oleh']) ?></small>
                                 <div><?= e($h['catatan'] ?: '-') ?></div>
                             </div><?php endforeach; ?></div>
-                </section><a class="btn secondary" href="aspirasi.php">← Kembali</a><?php endif; ?>
+                </section><a class="btn secondary" href="<?= e(url('admin/aspirasi')) ?>">← Kembali</a><?php endif; ?>
         </main>
     </div>
 </body>

@@ -13,15 +13,27 @@ mysqli_set_charset($conn, 'utf8mb4');
 function e($value) { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
 function redirect($path) { header('Location: ' . $path); exit; }
 
-// Menghitung path relatif ke login.php dari file yang sedang dijalankan,
-// supaya benar baik dipanggil dari root/, controller/, maupun view/admin|user/.
-function login_redirect_path() {
-    $root    = str_replace('\\', '/', dirname(__DIR__));           // .../pengaduan_sarpas
-    $current = str_replace('\\', '/', dirname($_SERVER['SCRIPT_FILENAME']));
-    $rel     = trim(str_replace($root, '', $current), '/');
-    $depth   = $rel === '' ? 0 : substr_count($rel, '/') + 1;
-    return str_repeat('../', $depth) . 'auth/login.php';
+// $base = path absolut ke root project (mis. "/pengaduan_sarpas"), dihitung dari
+// DOCUMENT_ROOT sehingga SELALU benar dari file manapun (view/admin, view/user,
+// auth, controller) dan tidak peduli apakah URL sedang "dipercantik" oleh .htaccess
+// atau diakses lewat path file aslinya.
+function base_url() {
+    $root = str_replace('\\', '/', dirname(__DIR__)); // .../pengaduan_sarpas
+    $docRoot = isset($_SERVER['DOCUMENT_ROOT']) ? str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'], '/')) : '';
+    $rel = ($docRoot !== '' && strpos($root, $docRoot) === 0) ? substr($root, strlen($docRoot)) : '';
+    $rel = '/' . trim($rel, '/');
+    return $rel === '/' ? '' : $rel;
 }
+$base = base_url();
+
+// Bikin URL "cantik" (tanpa .php, tanpa folder view/) berbasis $base.
+// Contoh: url('admin/dashboard') -> /pengaduan_sarpas/admin/dashboard
+function url($path) {
+    global $base;
+    return $base . '/' . ltrim($path, '/');
+}
+
+function login_redirect_path() { return url('auth/login'); }
 function require_login() { if (empty($_SESSION['role'])) redirect(login_redirect_path()); }
 function require_role($role) { require_login(); if ($_SESSION['role'] !== $role) redirect(login_redirect_path()); }
 function current_user() {

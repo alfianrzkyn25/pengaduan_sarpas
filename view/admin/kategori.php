@@ -11,7 +11,7 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Kategori Sarpras</title>
-    <link rel="stylesheet" href="../../assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
 </head>
 
 <body>
@@ -19,13 +19,13 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
         <ul>
-            <li><a href="dashboard.php" class="">Dashboard</a></li>
-            <li><a href="aspirasi.php" class="">Data Aspirasi</a></li>
-            <li><a href="form_aspirasi.php" class="">form aspirasi</a></li>
-            <li><a href="histori.php" class="">Histori Laporan</a></li>
-            <li><a href="kategori.php" class="active">Kategori Sarpras</a></li>
-            <li><a href="siswa.php">Kelola Siswa</a></li>
-            <li><a href="../../auth/logout.php">Keluar</a></li>
+            <li><a href="<?= e(url('admin/dashboard')) ?>" class="">Dashboard</a></li>
+            <li><a href="<?= e(url('admin/aspirasi')) ?>" class="">Data Aspirasi</a></li>
+            <li><a href="<?= e(url('admin/form_aspirasi')) ?>" class="">form aspirasi</a></li>
+            <li><a href="<?= e(url('admin/histori')) ?>" class="">Histori Laporan</a></li>
+            <li><a href="<?= e(url('admin/kategori')) ?>" class="active">Kategori Sarpras</a></li>
+            <li><a href="<?= e(url('admin/siswa')) ?>">Kelola Siswa</a></li>
+            <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
         <div class="admin-user"><strong><?= e($user["nama"] ?? "Admin") ?></strong>Administrator</div>
     </aside>
@@ -50,7 +50,7 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
                                 <td><?= $k['id_kategori'] ?></td>
                                 <td><?= e($k['nama_kategori']) ?></td>
                                 <td><?= $k['jumlah'] ?></td>
-                                <td><a class="btn" href="aspirasi.php?q=<?= urlencode($k['nama_kategori']) ?>">Lihat Aspirasi</a></td>
+                                <td><a class="btn" href="<?= e(url('admin/aspirasi')) ?>?q=<?= urlencode($k['nama_kategori']) ?>">Lihat Aspirasi</a></td>
                             </tr>
                         <?php endwhile; ?>
                     </table>

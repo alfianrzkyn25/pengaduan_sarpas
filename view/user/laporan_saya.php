@@ -14,7 +14,7 @@ $r = mysqli_stmt_get_result($st);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Laporan Saya</title>
-  <link rel="stylesheet" href="../../assets/admin.css">
+  <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
   <style>
     .item-wrap {
       position: relative;
@@ -203,10 +203,10 @@ $r = mysqli_stmt_get_result($st);
     <div class="sidebar-header">Pengaduan Sarpras</div>
     <div class="sidebar-sub">Portal Siswa</div>
     <ul>
-      <li><a href="dashboard.php">Beranda</a></li>
-      <li><a href="buat_pengaduan.php">Buat Pengaduan</a></li>
-      <li><a href="laporan_saya.php" class="active">Laporan Saya</a></li>
-      <li><a href="../../auth/logout.php">Keluar</a></li>
+      <li><a href="<?= e(url('user/dashboard')) ?>">Beranda</a></li>
+      <li><a href="<?= e(url('user/buat_pengaduan')) ?>">Buat Pengaduan</a></li>
+      <li><a href="<?= e(url('user/laporan_saya')) ?>" class="active">Laporan Saya</a></li>
+      <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
     </ul>
     <div class="admin-user"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa</div>
   </aside>
@@ -224,7 +224,7 @@ $r = mysqli_stmt_get_result($st);
           <h1>Laporan Saya</h1>
           <p class="muted">Semua pengaduan yang kamu kirim.</p>
         </div>
-        <a class="btn" href="buat_pengaduan.php">+ Buat Pengaduan</a>
+        <a class="btn" href="<?= e(url('user/buat_pengaduan')) ?>">+ Buat Pengaduan</a>
       </div>
 
       <section class="panel">
@@ -237,7 +237,7 @@ $r = mysqli_stmt_get_result($st);
           <?php while ($a = mysqli_fetch_assoc($r)): ?>
             <div class="item-wrap">
               <a class="item has-action"
-                href="detail_laporan.php?id=<?= (int)$a['id_aspirasi'] ?>">
+                href="<?= e(url('user/detail_laporan')) ?>?id=<?= (int)$a['id_aspirasi'] ?>">
                 <div>
                   <b>#<?= (int)$a['id_aspirasi'] ?> &middot; <?= e($a['nama_kategori']) ?></b>
                   <span><?= e($a['lokasi']) ?></span>
@@ -262,7 +262,7 @@ $r = mysqli_stmt_get_result($st);
       <small id="modalNote"></small>
       <div class="modal-actions">
         <button class="btn-batal" onclick="tutupModal()">Batal</button>
-        <form method="POST" action="../../controller/c_hapus_laporan.php" style="display:inline">
+        <form method="POST" action="<?= e($base) ?>/controller/c_hapus_laporan.php" style="display:inline">
           <input type="hidden" name="id_aspirasi" id="inputIdAspirasi" value="">
           <button type="submit" class="btn-konfirm">Ya, Hapus</button>
         </form>
