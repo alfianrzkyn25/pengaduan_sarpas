@@ -165,6 +165,19 @@ $pesan = '';
 if (isset($_GET['saved'])) $pesan = 'Profil berhasil diperbarui.';
 if (isset($_GET['fotodihapus'])) $pesan = 'Foto profil berhasil dihapus.';
 $punyaFoto = foto_profil_url($user['foto'] ?? '') !== '';
+
+// Ringkasan status laporan milik siswa, untuk kartu statistik di halaman ini.
+$ringkasan = ['Menunggu' => 0, 'Proses' => 0, 'Selesai' => 0, 'Ditolak' => 0];
+$st = mysqli_prepare($conn, 'SELECT status,COUNT(*) AS jml FROM aspirasi WHERE nis=? GROUP BY status');
+mysqli_stmt_bind_param($st, 's', $user['nis']);
+mysqli_stmt_execute($st);
+$rs = mysqli_stmt_get_result($st);
+while ($row = mysqli_fetch_assoc($rs)) {
+    if (isset($ringkasan[$row['status']])) $ringkasan[$row['status']] = (int)$row['jml'];
+}
+mysqli_stmt_close($st);
+$totalLaporan = array_sum($ringkasan);
+$selesaiPct = $totalLaporan ? (int)round($ringkasan['Selesai'] / $totalLaporan * 100) : 0;
 ?>
 <!doctype html>
 <html lang="id">
@@ -177,7 +190,7 @@ $punyaFoto = foto_profil_url($user['foto'] ?? '') !== '';
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
 </head>
 
-<body>
+<body class="profile-page">
     <input type="checkbox" id="menuToggle" class="menu-toggle">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">Pengaduan Sarpras</div>
@@ -211,35 +224,84 @@ $punyaFoto = foto_profil_url($user['foto'] ?? '') !== '';
             </div>
 
             <?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?>
-            <?php if ($pesan): ?><div class="alert success"><?= e($pesan) ?></div><?php endif; ?>
+            <?php if ($pesan): ?>
+                <div class="alert success js-flash">
+                    <span class="flash-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6 9 17l-5-5"></path>
+                        </svg></span>
+                    <span><?= e($pesan) ?></span>
+                </div>
+            <?php endif; ?>
 
-            <section class="panel profile-hero">
-                <?= avatar($user['foto'] ?? null, $user['nama'], 'xl') ?>
-                <div>
-                    <h2><?= e($user['nama']) ?></h2>
-                    <div class="profile-meta">
-                        <span class="profile-chip">NIS · <?= e($user['nis']) ?></span>
-                        <span class="profile-chip soft">Kelas · <?= e($user['kelas']) ?></span>
+            <section class="panel hero-card">
+                <div class="hero-banner">
+                    <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+                </div>
+                <div class="hero-body">
+                    <div class="avatar-ring">
+                        <span id="heroAvatar"><?= avatar($user['foto'] ?? null, $user['nama'], 'xl') ?></span>
+                        <label class="cam-btn" for="foto" aria-label="Ganti foto profil" title="Ganti foto profil">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.6h3.4a2 2 0 0 1 1.7 1L17 8h3a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 8Z"></path>
+                                <circle cx="12" cy="13.5" r="3.5"></circle>
+                            </svg>
+                        </label>
                     </div>
-                    <?php if ($punyaFoto): ?>
-                        <form method="post" onsubmit="return confirm('Hapus foto profil?');">
-                            <input type="hidden" name="aksi" value="hapus_foto">
-                            <button type="submit" class="btn secondary small">Hapus Foto</button>
-                        </form>
-                    <?php endif; ?>
+                    <div class="hero-info">
+                        <h2><?= e($user['nama']) ?></h2>
+                        <div class="profile-meta">
+                            <span class="profile-chip">NIS · <?= e($user['nis']) ?></span>
+                            <span class="profile-chip soft">Kelas · <?= e($user['kelas']) ?></span>
+                            <span class="pending-tag" <?= $ringkasan['Menunggu'] ? '' : 'hidden' ?>><?= (int)$ringkasan['Menunggu'] ?> laporan menunggu</span>
+                        </div>
+                        <?php if ($punyaFoto): ?>
+                            <button type="button" class="btn secondary small" id="btnHapusFoto">Hapus Foto</button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </section>
 
             <section class="panel">
+                <h2 style="margin-top:0;margin-bottom:16px">Laporan Saya</h2>
+                <?php if ($totalLaporan === 0): ?>
+                    <p class="pstat-empty">Kamu belum pernah membuat pengaduan. <a href="<?= e(url('user/buat_pengaduan')) ?>">Buat laporan pertamamu →</a></p>
+                <?php else: ?>
+                    <div class="pstats">
+                        <div class="pstat" style="--c:#f59e0b;--i:0">
+                            <span class="pstat-num"><?= (int)$ringkasan['Menunggu'] ?></span>
+                            <span class="pstat-label">Menunggu</span>
+                        </div>
+                        <div class="pstat" style="--c:#2563eb;--i:1">
+                            <span class="pstat-num"><?= (int)$ringkasan['Proses'] ?></span>
+                            <span class="pstat-label">Diproses</span>
+                        </div>
+                        <div class="pstat" style="--c:#16a34a;--i:2">
+                            <span class="pstat-num"><?= (int)$ringkasan['Selesai'] ?></span>
+                            <span class="pstat-label">Selesai</span>
+                        </div>
+                        <div class="pstat" style="--c:#dc2626;--i:3">
+                            <span class="pstat-num"><?= (int)$ringkasan['Ditolak'] ?></span>
+                            <span class="pstat-label">Ditolak</span>
+                        </div>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-head"><span>Tingkat penyelesaian</span><b><?= $selesaiPct ?>%</b></div>
+                        <div class="progress"><span class="progress-fill" style="--w:<?= $selesaiPct ?>%"></span></div>
+                    </div>
+                <?php endif; ?>
+            </section>
+
+            <section class="panel">
                 <h2 style="margin-top:0;margin-bottom:16px">Ubah Profil</h2>
-                <form method="post" class="admin-form profile-form" enctype="multipart/form-data">
+                <form method="post" class="admin-form profile-form" enctype="multipart/form-data" id="formProfil">
                     <input type="hidden" name="aksi" value="simpan">
 
                     <div>
                         <label for="foto">Foto Profil</label>
-                        <div class="photo-field" style="margin-top:7px">
+                        <div class="photo-field" style="margin-top:7px" id="dropZone">
                             <span id="fotoPreview"><?= avatar($user['foto'] ?? null, $form['nama'] ?: $user['nama'], 'lg') ?></span>
                             <div class="photo-input">
+                                <p class="drop-title">Tarik &amp; lepas foto di sini, atau pilih file</p>
                                 <input id="foto" type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp">
                                 <span class="form-help">Format JPG/PNG/GIF/WEBP, maksimal 5MB. Foto otomatis dipotong kotak agar pas jadi foto profil.</span>
                                 <span class="photo-error" id="fotoError"></span>
@@ -263,54 +325,147 @@ $punyaFoto = foto_profil_url($user['foto'] ?? '') !== '';
 
                     <div class="form-actions">
                         <a class="btn secondary" href="<?= e(url('user/dashboard')) ?>">Batal</a>
-                        <button class="btn" type="submit">Simpan Perubahan</button>
+                        <button class="btn" type="submit" id="btnSimpan">Simpan Perubahan</button>
                     </div>
                 </form>
             </section>
         </main>
     </div>
 
+    <?php if ($punyaFoto): ?>
+        <form method="post" id="formHapusFoto" hidden>
+            <input type="hidden" name="aksi" value="hapus_foto">
+        </form>
+        <div class="pf-modal" id="pfModal" role="dialog" aria-modal="true" aria-labelledby="pfModalTitle">
+            <div class="pf-modal-box">
+                <h3 id="pfModalTitle">Hapus foto profil?</h3>
+                <p>Foto akan diganti dengan inisial namamu di semua halaman.</p>
+                <div class="pf-modal-actions">
+                    <button type="button" class="btn secondary" id="pfModalCancel">Batal</button>
+                    <button type="button" class="btn danger" id="pfModalConfirm">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <script>
-        // Pratinjau foto sebelum disimpan.
+        // Pratinjau foto sebelum disimpan (dipicu dari pilih file, drag & drop, atau ikon kamera).
         (function() {
             var input = document.getElementById('foto');
             var preview = document.getElementById('fotoPreview');
+            var heroAvatar = document.getElementById('heroAvatar');
+            var dropZone = document.getElementById('dropZone');
             var err = document.getElementById('fotoError');
             var maxBytes = 5 * 1024 * 1024;
-            var semula = preview.innerHTML;
-            input.addEventListener('change', function() {
+            var semulaForm = preview.innerHTML;
+            var semulaHero = heroAvatar.innerHTML;
+
+            function terapkan(f) {
                 err.style.display = 'none';
-                var f = input.files && input.files[0];
-                if (!f) {
-                    preview.innerHTML = semula;
-                    return;
-                }
+                if (!f) return;
                 if (!/^image\/(jpeg|png|gif|webp)$/.test(f.type)) {
                     err.textContent = 'Format foto tidak didukung.';
                     err.style.display = 'block';
                     input.value = '';
-                    preview.innerHTML = semula;
                     return;
                 }
                 if (f.size > maxBytes) {
                     err.textContent = 'Ukuran foto maksimal 5MB.';
                     err.style.display = 'block';
                     input.value = '';
-                    preview.innerHTML = semula;
                     return;
                 }
                 var reader = new FileReader();
                 reader.onload = function(ev) {
-                    var span = document.createElement('span');
-                    span.className = 'avatar avatar-lg';
-                    var img = document.createElement('img');
-                    img.src = ev.target.result;
-                    img.alt = 'Pratinjau foto profil';
-                    span.appendChild(img);
-                    preview.innerHTML = '';
-                    preview.appendChild(span);
+                    ['avatar avatar-lg', 'avatar avatar-xl'].forEach(function(cls, i) {
+                        var span = document.createElement('span');
+                        span.className = cls;
+                        var img = document.createElement('img');
+                        img.src = ev.target.result;
+                        img.alt = 'Pratinjau foto profil';
+                        span.appendChild(img);
+                        (i === 0 ? preview : heroAvatar).innerHTML = '';
+                        (i === 0 ? preview : heroAvatar).appendChild(span);
+                    });
                 };
                 reader.readAsDataURL(f);
+            }
+
+            input.addEventListener('change', function() {
+                var f = input.files && input.files[0];
+                if (!f) {
+                    preview.innerHTML = semulaForm;
+                    heroAvatar.innerHTML = semulaHero;
+                    return;
+                }
+                terapkan(f);
+            });
+
+            ['dragenter', 'dragover'].forEach(function(evt) {
+                dropZone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    dropZone.classList.add('is-drag');
+                });
+            });
+            ['dragleave', 'dragend', 'drop'].forEach(function(evt) {
+                dropZone.addEventListener(evt, function(e) {
+                    e.preventDefault();
+                    dropZone.classList.remove('is-drag');
+                });
+            });
+            dropZone.addEventListener('drop', function(e) {
+                var f = e.dataTransfer.files && e.dataTransfer.files[0];
+                if (!f) return;
+                try {
+                    input.files = e.dataTransfer.files;
+                } catch (ex) {}
+                terapkan(f);
+            });
+        })();
+
+        // Tombol simpan menampilkan indikator memuat saat form dikirim.
+        (function() {
+            var form = document.getElementById('formProfil');
+            var btn = document.getElementById('btnSimpan');
+            form.addEventListener('submit', function() {
+                btn.classList.add('is-loading');
+                btn.textContent = ' Menyimpan…';
+            });
+        })();
+
+        // Notifikasi sukses hilang otomatis.
+        (function() {
+            var flash = document.querySelector('.js-flash');
+            if (!flash) return;
+            setTimeout(function() {
+                flash.classList.add('is-leaving');
+            }, 3200);
+        })();
+
+        // Modal konfirmasi hapus foto.
+        (function() {
+            var modal = document.getElementById('pfModal');
+            var btnOpen = document.getElementById('btnHapusFoto');
+            if (!modal || !btnOpen) return;
+            var cancel = document.getElementById('pfModalCancel');
+            var confirmBtn = document.getElementById('pfModalConfirm');
+
+            function tutup() {
+                modal.classList.remove('open');
+            }
+            btnOpen.addEventListener('click', function() {
+                modal.classList.add('open');
+            });
+            cancel.addEventListener('click', tutup);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) tutup();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') tutup();
+            });
+            confirmBtn.addEventListener('click', function() {
+                confirmBtn.classList.add('is-loading');
+                document.getElementById('formHapusFoto').submit();
             });
         })();
     </script>

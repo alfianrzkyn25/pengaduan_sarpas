@@ -40,7 +40,7 @@ function current_user() {
     global $conn;
     if (empty($_SESSION['role'])) return null;
     if ($_SESSION['role'] === 'siswa' && !empty($_SESSION['nis'])) {
-        $st=mysqli_prepare($conn,'SELECT nis,nama,kelas FROM siswa WHERE nis=?'); mysqli_stmt_bind_param($st,'s',$_SESSION['nis']); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st); $u=mysqli_fetch_assoc($r); mysqli_stmt_close($st); return $u;
+        $st=mysqli_prepare($conn,'SELECT nis,nama,kelas,foto FROM siswa WHERE nis=?'); mysqli_stmt_bind_param($st,'s',$_SESSION['nis']); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st); $u=mysqli_fetch_assoc($r); mysqli_stmt_close($st); return $u;
     }
     if ($_SESSION['role'] === 'admin' && !empty($_SESSION['id_admin'])) {
         $id=(int)$_SESSION['id_admin']; $st=mysqli_prepare($conn,'SELECT id_admin,username,nama FROM admin WHERE id_admin=?'); mysqli_stmt_bind_param($st,'i',$id); mysqli_stmt_execute($st); $r=mysqli_stmt_get_result($st); $u=mysqli_fetch_assoc($r); mysqli_stmt_close($st); return $u;
@@ -52,4 +52,57 @@ function default_admin_id() {
     $r=mysqli_query($conn,'SELECT id_admin FROM admin ORDER BY id_admin ASC LIMIT 1');
     $row=$r?mysqli_fetch_assoc($r):null;
     return $row ? (int)$row['id_admin'] : 0;
+}
+
+// ---------------------------------------------------------------------------
+// FOTO PROFIL SISWA
+// ---------------------------------------------------------------------------
+
+// Pastikan kolom siswa.foto ada (sudah ada di pengaduan_sarpas.sql). Kalau database
+// lama belum punya kolomnya, otomatis ditambahkan sekali saja.
+function ensure_siswa_foto_column() {
+    global $conn;
+    $ada = false;
+    try {
+        $r = mysqli_query($conn, "SHOW COLUMNS FROM `siswa` LIKE 'foto'");
+        if ($r && mysqli_num_rows($r) === 0) {
+            mysqli_query($conn, "ALTER TABLE `siswa` ADD COLUMN `foto` VARCHAR(255) NULL DEFAULT NULL");
+            $r = mysqli_query($conn, "SHOW COLUMNS FROM `siswa` LIKE 'foto'");
+        }
+        $ada = $r && mysqli_num_rows($r) > 0;
+    } catch (Throwable $ex) {
+        $ada = false;
+    }
+    if (!$ada) die('Kolom "foto" di tabel siswa belum ada dan gagal dibuat otomatis. Import ulang pengaduan_sarpas.sql atau jalankan: ALTER TABLE siswa ADD COLUMN foto VARCHAR(255) NULL;');
+}
+ensure_siswa_foto_column();
+
+// Inisial nama untuk avatar cadangan (mis. "Fajar Nur" -> "FN").
+function avatar_initials($nama) {
+    $nama = trim((string)$nama);
+    if ($nama === '') return '?';
+    $parts = preg_split('/\s+/u', $nama);
+    $ini = mb_substr($parts[0], 0, 1, 'UTF-8');
+    if (count($parts) > 1) $ini .= mb_substr(end($parts), 0, 1, 'UTF-8');
+    return mb_strtoupper($ini, 'UTF-8');
+}
+
+// URL foto profil, atau string kosong kalau belum ada / filenya hilang.
+function foto_profil_url($foto) {
+    global $base;
+    $foto = ltrim((string)$foto, '/');
+    if ($foto === '' || strpos($foto, '..') !== false) return '';
+    if (!is_file(dirname(__DIR__) . '/' . $foto)) return '';
+    return $base . '/' . $foto;
+}
+
+// HTML avatar bulat: foto profil kalau ada, kalau tidak inisial nama.
+// $size: sm (32px) | md (42px) | lg (104px) | xl (112px). Butuh assets/profil.css.
+function avatar($foto, $nama, $size = 'md') {
+    $src = foto_profil_url($foto);
+    $cls = 'avatar avatar-' . preg_replace('/[^a-z]/', '', (string)$size);
+    if ($src !== '') {
+        return '<span class="' . $cls . '"><img src="' . e($src) . '" alt="Foto ' . e($nama) . '"></span>';
+    }
+    return '<span class="' . $cls . ' avatar-fallback" title="' . e($nama) . '">' . e(avatar_initials($nama)) . '</span>';
 }

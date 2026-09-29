@@ -198,7 +198,8 @@ CREATE TABLE `siswa` (
   `nis` varchar(10) NOT NULL,
   `nama` varchar(50) NOT NULL,
   `kelas` varchar(10) NOT NULL,
-  `password` varchar(25) NOT NULL
+  `password` varchar(25) NOT NULL,
+  `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

@@ -119,7 +119,7 @@ if (isset($_GET['updated'])) $ok = 'Status dan feedback berhasil diperbarui.';
 
 $a = null;
 $hist = [];
-$st = mysqli_prepare($conn, 'SELECT a.*,s.nama AS nama_siswa,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=?');
+$st = mysqli_prepare($conn, 'SELECT a.*,s.nama AS nama_siswa,s.kelas,s.foto AS foto_siswa,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=?');
 mysqli_stmt_bind_param($st, 'i', $id);
 mysqli_stmt_execute($st);
 $a = mysqli_fetch_assoc(mysqli_stmt_get_result($st));
@@ -161,6 +161,7 @@ if ($a && $a['status'] !== 'Ditolak') {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Detail Aspirasi</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
 </head>
 
 <body><input type="checkbox" id="menuToggle" class="menu-toggle">
@@ -190,7 +191,7 @@ if ($a && $a['status'] !== 'Ditolak') {
                 </div><?php if ($a['status'] === 'Ditolak'): ?><div class="alert error" style="margin-top:-8px">Aspirasi ini telah <b>ditolak</b> dan statusnya terkunci (tidak dapat diubah lagi). Alasan: <?= e($a['feedback'] ?: '-') ?></div><?php endif; ?><div class="detail">
                     <section class="panel">
                         <h2>Detail Laporan</h2>
-                        <p><b>Pelapor</b><?= e($a['nama_siswa']) ?> · <?= e($a['kelas']) ?></p>
+                        <p><b>Pelapor</b><span class="reporter-inline"><?= avatar($a['foto_siswa'] ?? null, $a['nama_siswa'], 'sm') ?><span><?= e($a['nama_siswa']) ?> · <?= e($a['kelas']) ?></span></span></p>
                         <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
                         <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
                         <p><b>Feedback</b><?= e($a['feedback'] ?: '-') ?></p>

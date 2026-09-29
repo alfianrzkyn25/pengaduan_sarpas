@@ -5,7 +5,7 @@ $user = current_user();
 $id = (int)($_GET['id'] ?? 0);
 $saved = isset($_GET['saved']);
 
-$st = mysqli_prepare($conn, 'SELECT a.*,s.nama,s.kelas,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=? AND a.nis=?');
+$st = mysqli_prepare($conn, 'SELECT a.*,s.nama,s.kelas,s.foto,k.nama_kategori FROM aspirasi a JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.id_aspirasi=? AND a.nis=?');
 mysqli_stmt_bind_param($st, 'is', $id, $user['nis']);
 mysqli_stmt_execute($st);
 $a = mysqli_fetch_assoc(mysqli_stmt_get_result($st));
@@ -46,6 +46,7 @@ if ($a) {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Detail Laporan</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
 </head>
 
 <body>
@@ -57,9 +58,15 @@ if ($a) {
             <li><a href="<?= e(url('user/dashboard')) ?>" class="">Beranda</a></li>
             <li><a href="<?= e(url('user/buat_pengaduan')) ?>" class="">Buat Pengaduan</a></li>
             <li><a href="<?= e(url('user/laporan_saya')) ?>" class="active">Laporan Saya</a></li>
+            <li><a href="<?= e(url('user/profil')) ?>">Profil Saya</a></li>
             <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
-        <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
+        <div class="admin-user has-avatar">
+            <a class="user-chip" href="<?= e(url('user/profil')) ?>" title="Lihat profil">
+                <?= avatar($user['foto'] ?? null, $user['nama'] ?? 'Siswa', 'md') ?>
+                <div class="who"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa · <?= e($user['kelas'] ?? '') ?></div>
+            </a>
+        </div>
     </aside>
     <label for="menuToggle" class="sidebar-overlay"></label>
     <div class="main-content">
@@ -79,7 +86,7 @@ if ($a) {
                 <div class="detail">
                     <section class="panel">
                         <h2>Informasi Pengaduan</h2>
-                        <p><b>Pelapor</b><?= e($a['nama']) ?> · <?= e($a['kelas']) ?></p>
+                        <p><b>Pelapor</b><span class="reporter-inline"><?= avatar($a['foto'] ?? null, $a['nama'], 'sm') ?><span><?= e($a['nama']) ?> · <?= e($a['kelas']) ?></span></span></p>
                         <p><b>Lokasi</b><?= e($a['lokasi']) ?></p>
                         <p><b>Keterangan</b><?= e($a['keterangan']) ?></p>
                         <?php if ($fotoPengaduan): ?><div style="margin-top:10px"><b>Foto Pengaduan</b>

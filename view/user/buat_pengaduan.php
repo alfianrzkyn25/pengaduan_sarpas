@@ -76,6 +76,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Buat Pengaduan</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
 </head>
 
 <body>
@@ -87,9 +88,15 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
             <li><a href="<?= e(url('user/dashboard')) ?>" class="">Beranda</a></li>
             <li><a href="<?= e(url('user/buat_pengaduan')) ?>" class="active">Buat Pengaduan</a></li>
             <li><a href="<?= e(url('user/laporan_saya')) ?>" class="">Laporan Saya</a></li>
+            <li><a href="<?= e(url('user/profil')) ?>">Profil Saya</a></li>
             <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
         </ul>
-        <div class="admin-user"><strong><?= e($user["nama"] ?? "Siswa") ?></strong>Siswa</div>
+        <div class="admin-user has-avatar">
+            <a class="user-chip" href="<?= e(url('user/profil')) ?>" title="Lihat profil">
+                <?= avatar($user['foto'] ?? null, $user['nama'] ?? 'Siswa', 'md') ?>
+                <div class="who"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa · <?= e($user['kelas'] ?? '') ?></div>
+            </a>
+        </div>
     </aside>
     <label for="menuToggle" class="sidebar-overlay"></label>
     <div class="main-content">
@@ -100,6 +107,15 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
             <?php if ($error): ?><div class="alert error"><?= e($error) ?></div><?php endif; ?>
             <section class="panel">
                 <h2 style="margin-top:0">Formulir Pengaduan Baru</h2>
+                <div class="reporter-card">
+                    <?= avatar($user['foto'] ?? null, $user['nama'] ?? 'Siswa', 'lg') ?>
+                    <div class="reporter-info">
+                        <small>Dilaporkan oleh</small>
+                        <strong><?= e($user['nama'] ?? 'Siswa') ?></strong>
+                        <span class="reporter-meta">NIS <?= e($user['nis'] ?? '') ?> · <?= e($user['kelas'] ?? '') ?></span>
+                    </div>
+                    <a class="reporter-edit" href="<?= e(url('user/profil')) ?>">Ubah profil</a>
+                </div>
                 <form method="post" class="admin-form" enctype="multipart/form-data">
                     <label>Kategori<select name="id_kategori" required>
                             <option value="">Pilih kategori</option><?php while ($c = mysqli_fetch_assoc($cats)): ?><option value="<?= $c['id_kategori'] ?>"><?= e($c['nama_kategori']) ?> — <?= e($c['ket_kategori']) ?></option><?php endwhile; ?>

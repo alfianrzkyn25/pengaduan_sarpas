@@ -96,6 +96,7 @@ mysqli_stmt_close($st);
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Edit Laporan #<?= (int)$a['id_aspirasi'] ?></title>
   <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+  <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
   <style>
     .alert.error {
       background: #fef2f2;
@@ -182,9 +183,15 @@ mysqli_stmt_close($st);
       <li><a href="<?= e(url('user/dashboard')) ?>">Beranda</a></li>
       <li><a href="<?= e(url('user/buat_pengaduan')) ?>">Buat Pengaduan</a></li>
       <li><a href="<?= e(url('user/laporan_saya')) ?>" class="active">Laporan Saya</a></li>
+      <li><a href="<?= e(url('user/profil')) ?>">Profil Saya</a></li>
       <li><a href="<?= e(url('auth/logout')) ?>">Keluar</a></li>
     </ul>
-    <div class="admin-user"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa</div>
+    <div class="admin-user has-avatar">
+        <a class="user-chip" href="<?= e(url('user/profil')) ?>" title="Lihat profil">
+            <?= avatar($user['foto'] ?? null, $user['nama'] ?? 'Siswa', 'md') ?>
+            <div class="who"><strong><?= e($user['nama'] ?? 'Siswa') ?></strong>Siswa · <?= e($user['kelas'] ?? '') ?></div>
+        </a>
+    </div>
   </aside>
   <label for="menuToggle" class="sidebar-overlay"></label>
 

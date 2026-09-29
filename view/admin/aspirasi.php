@@ -6,12 +6,12 @@ $q = trim($_GET['q'] ?? '');
 $rows = [];
 if ($q !== '') {
     $like = '%' . $q . '%';
-    $st = mysqli_prepare($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lokasi,a.keterangan,a.feedback,a.status,a.tanggal FROM aspirasi a LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.nis LIKE ? OR s.nama LIKE ? OR k.nama_kategori LIKE ? OR a.lokasi LIKE ? OR a.keterangan LIKE ? OR a.status LIKE ? ORDER BY a.tanggal DESC,a.id_aspirasi DESC");
+    $st = mysqli_prepare($conn, "SELECT a.id_aspirasi,a.nis,s.nama,s.foto,k.nama_kategori,a.lokasi,a.keterangan,a.feedback,a.status,a.tanggal FROM aspirasi a LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori WHERE a.nis LIKE ? OR s.nama LIKE ? OR k.nama_kategori LIKE ? OR a.lokasi LIKE ? OR a.keterangan LIKE ? OR a.status LIKE ? ORDER BY a.tanggal DESC,a.id_aspirasi DESC");
     mysqli_stmt_bind_param($st, 'ssssss', $like, $like, $like, $like, $like, $like);
     mysqli_stmt_execute($st);
     $res = mysqli_stmt_get_result($st);
 } else {
-    $res = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lokasi,a.keterangan,a.feedback,a.status,a.tanggal FROM aspirasi a LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori ORDER BY a.tanggal DESC,a.id_aspirasi DESC");
+    $res = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,s.foto,k.nama_kategori,a.lokasi,a.keterangan,a.feedback,a.status,a.tanggal FROM aspirasi a LEFT JOIN siswa s ON s.nis=a.nis LEFT JOIN kategori k ON k.id_kategori=a.id_kategori ORDER BY a.tanggal DESC,a.id_aspirasi DESC");
 }
 while ($x = mysqli_fetch_assoc($res)) $rows[] = $x;
 if (isset($st)) mysqli_stmt_close($st);
@@ -24,6 +24,7 @@ if (isset($st)) mysqli_stmt_close($st);
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Data Aspirasi</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
 </head>
 
 <body>
@@ -70,7 +71,9 @@ if (isset($st)) mysqli_stmt_close($st);
                             <tr>
                                 <td>#<?= $a['id_aspirasi'] ?></td>
                                 <td><?= e($a['nis']) ?></td>
-                                <td><?= e($a['nama']) ?></td>
+                                <td>
+                                    <div class="reporter-inline"><?= avatar($a['foto'] ?? null, $a['nama'] ?? '', 'sm') ?><span class="reporter-name"><?= e($a['nama']) ?></span></div>
+                                </td>
                                 <td><?= e($a['nama_kategori']) ?></td>
                                 <td><?= e($a['lokasi']) ?></td>
                                 <td><?= e($a['keterangan']) ?></td>
