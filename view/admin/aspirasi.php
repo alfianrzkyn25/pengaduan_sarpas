@@ -25,6 +25,7 @@ if (isset($st)) mysqli_stmt_close($st);
     <title>Data Aspirasi</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -79,7 +80,7 @@ if (isset($st)) mysqli_stmt_close($st);
                                 <td><?= e($a['keterangan']) ?></td>
                                 <td><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span></td>
                                 <td><?= e($a['feedback'] ?: '-') ?></td>
-                                <td><a class="btn" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
+                                <td><a class="btn small" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>

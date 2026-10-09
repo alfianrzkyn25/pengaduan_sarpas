@@ -12,6 +12,7 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Kategori Sarpras</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -50,7 +51,7 @@ $r = mysqli_query($conn, "SELECT k.id_kategori,k.nama_kategori,k.ket_kategori,CO
                                 <td><?= $k['id_kategori'] ?></td>
                                 <td><?= e($k['nama_kategori']) ?></td>
                                 <td><?= $k['jumlah'] ?></td>
-                                <td><a class="btn" href="<?= e(url('admin/aspirasi')) ?>?q=<?= urlencode($k['nama_kategori']) ?>">Lihat Aspirasi</a></td>
+                                <td><a class="btn small" href="<?= e(url('admin/aspirasi')) ?>?q=<?= urlencode($k['nama_kategori']) ?>">Lihat Aspirasi</a></td>
                             </tr>
                         <?php endwhile; ?>
                     </table>

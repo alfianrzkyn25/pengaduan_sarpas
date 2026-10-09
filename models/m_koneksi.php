@@ -1,8 +1,8 @@
 <?php
-$server = 'localhost';
-$username = 'root';
-$pass = ''; // biasanya kosong jika menggunakan XAMPP
-$database = 'pengaduan_sarpas';
+$server = 'sql211.infinityfree.com';
+$username = 'if0_43078283';
+$pass = 'cRMeygqIWD1';
+$database = 'if0_43078283_pengaduan_sarpas';
 
 $conn = mysqli_connect($server, $username, $pass, $database);
 

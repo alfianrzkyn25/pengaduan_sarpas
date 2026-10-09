@@ -233,6 +233,7 @@ if (isset($st) && $st instanceof mysqli_stmt) mysqli_stmt_close($st);
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Kelola Siswa</title>
   <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+  <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>

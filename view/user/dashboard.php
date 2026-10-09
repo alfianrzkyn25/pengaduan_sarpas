@@ -27,6 +27,7 @@ $r = mysqli_stmt_get_result($st);
     <title>Dashboard Siswa</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -62,11 +63,11 @@ $r = mysqli_stmt_get_result($st);
                 </div><a class="btn" href="<?= e(url('user/buat_pengaduan')) ?>">+ Buat Pengaduan</a>
             </div>
             <div class="grid">
-                <div class="card stat"><span>Total Laporan</span><strong><?= $stats['total'] ?></strong></div>
-                <div class="card stat"><span>Menunggu</span><strong><?= $stats['menunggu'] ?></strong></div>
-                <div class="card stat"><span>Diproses</span><strong><?= $stats['proses'] ?></strong></div>
-                <div class="card stat"><span>Selesai</span><strong><?= $stats['selesai'] ?></strong></div>
-                <div class="card stat"><span>Ditolak</span><strong><?= $stats['ditolak'] ?></strong></div>
+                <div class="card stat stat-total"><span>Total Laporan</span><strong data-count="<?= $stats['total'] ?>"><?= $stats['total'] ?></strong></div>
+                <div class="card stat stat-menunggu"><span>Menunggu</span><strong data-count="<?= $stats['menunggu'] ?>"><?= $stats['menunggu'] ?></strong></div>
+                <div class="card stat stat-proses"><span>Diproses</span><strong data-count="<?= $stats['proses'] ?>"><?= $stats['proses'] ?></strong></div>
+                <div class="card stat stat-selesai"><span>Selesai</span><strong data-count="<?= $stats['selesai'] ?>"><?= $stats['selesai'] ?></strong></div>
+                <div class="card stat stat-ditolak"><span>Ditolak</span><strong data-count="<?= $stats['ditolak'] ?>"><?= $stats['ditolak'] ?></strong></div>
             </div>
             <section class="panel">
                 <div class="panel-head">

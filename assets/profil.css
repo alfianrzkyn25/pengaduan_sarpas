@@ -1,7 +1,7 @@
 /* ==========================================================================
    Profil siswa: avatar, chip di sidebar, kartu pelapor, halaman profil.
-   Dimuat SETELAH admin.css dan hanya berisi class baru, jadi tampilan
-   halaman lain tidak berubah.
+   Dimuat SETELAH admin.css dan hanya berisi class baru. Memakai token warna
+   admin.css, sehingga ikut tema terang/gelap.
    ========================================================================== */
 :root{--pf-out:cubic-bezier(.22,1,.36,1);--pf-spring:cubic-bezier(.34,1.56,.64,1)}
 
@@ -76,10 +76,10 @@
 }
 .reporter-card::after{ /* kilau sekali saat kartu muncul */
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.85) 50%,transparent 62%);
+  background:linear-gradient(105deg,transparent 38%,var(--sweep) 50%,transparent 62%);
   transform:translateX(-120%);animation:pf-sweep 1.1s .55s var(--pf-out) 1 forwards;
 }
-.reporter-card .avatar{width:54px;height:54px;font-size:19px;box-shadow:0 0 0 3px #fff,0 0 0 5px #bfdbfe;animation:pf-pop .6s .2s var(--pf-spring) both}
+.reporter-card .avatar{width:54px;height:54px;font-size:19px;box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--primary-tint);animation:pf-pop .6s .2s var(--pf-spring) both}
 .reporter-card .reporter-info{min-width:0}
 .reporter-card small{display:block;font-size:12px;color:var(--text-muted);font-weight:600}
 .reporter-card strong{display:block;font-size:15px;font-weight:800;margin-top:2px}
@@ -122,7 +122,7 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
 .avatar-ring .cam-btn{
   position:absolute;right:-2px;bottom:2px;z-index:2;width:36px;height:36px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
-  background:linear-gradient(135deg,var(--primary),var(--primary-700));color:#fff;border:3px solid #fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary-700));color:#fff;border:3px solid var(--surface);
   box-shadow:0 6px 14px -4px rgba(37,99,235,.6);
   transition:transform .3s var(--pf-spring),filter .2s ease;
 }
@@ -139,7 +139,7 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
 .profile-chip.soft{background:var(--surface-soft);border:1px solid var(--border);color:var(--text-muted)}
 .pending-tag{
   display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
-  background:#fffbeb;border:1px solid #fde68a;color:#b45309;font-size:12px;font-weight:700;
+  background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn-fg);font-size:12px;font-weight:700;
   animation:pf-pop .45s var(--pf-spring) both;
 }
 .pending-tag[hidden]{display:none}
@@ -177,7 +177,7 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
 /* unggah foto */
 .photo-field{
   display:flex;align-items:center;gap:18px;padding:16px;
-  border:1.5px dashed #c7d2e6;border-radius:var(--radius-md);background:var(--surface-soft);
+  border:1.5px dashed var(--border-strong);border-radius:var(--radius-md);background:var(--surface-soft);
   transition:border-color .2s ease,background .2s ease,transform .3s var(--pf-spring);
 }
 .photo-field.is-drag{border-color:var(--primary);background:var(--primary-tint);transform:scale(1.015)}
@@ -186,7 +186,7 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
 .photo-field .photo-input input[type="file"]{margin-top:0}
 .photo-field .drop-title{font-size:14px;font-weight:700;margin-bottom:8px}
 .profile-form label:focus-within{color:var(--primary-700)}
-.profile-form input[readonly]{background:#eef1f6;color:var(--text-muted);cursor:not-allowed}
+.profile-form input[readonly]{background:var(--readonly);color:var(--text-muted);cursor:not-allowed}
 .profile-form .form-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .profile-form .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
 .profile-form .photo-error{display:none;color:#b91c1c;font-size:12px;margin-top:6px}
@@ -211,12 +211,12 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
 /* konfirmasi hapus foto */
 .pf-modal{
   position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:16px;
-  background:rgba(15,23,42,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+  background:var(--scrim);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
   opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;
 }
 .pf-modal.open{opacity:1;visibility:visible}
 .pf-modal-box{
-  width:100%;max-width:380px;padding:28px 28px 24px;text-align:center;background:#fff;border-radius:18px;
+  width:100%;max-width:380px;padding:28px 28px 24px;text-align:center;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:18px;
   box-shadow:var(--shadow-lg);transform:translateY(16px) scale(.95);transition:transform .32s var(--pf-spring);
 }
 .pf-modal.open .pf-modal-box{transform:none}
@@ -249,3 +249,23 @@ tr:hover .reporter-inline .avatar,.reporter-inline:hover .avatar{transform:scale
   .sidebar .admin-user a.user-chip::after,.profile-page .alert,.js-flash .flash-ico,.photo-field .avatar{animation:none!important}
   .avatar,.user-chip,.user-chip .avatar,.cam-btn,.photo-field,.pf-modal,.pf-modal-box,.js-flash{transition:none!important}
 }
+
+/* ==========================================================================
+   Mode nyaman untuk pemakaian lama
+   Gerakan yang berulang-ulang tanpa henti (gradasi bergeser, bola melayang,
+   cincin berputar, titik berdenyut) mengalihkan perhatian dan melelahkan mata.
+   Di sini semuanya dibuat diam; animasi yang tersisa hanya yang menjawab aksi
+   pengguna atau berjalan satu kali saat halaman dibuka.
+   ========================================================================== */
+.hero-banner,.hero-banner .orb,.avatar-ring::before,.reporter-card::before,
+.avatar-lg.avatar-fallback,.avatar-xl.avatar-fallback,
+.sidebar .admin-user a.user-chip::after,.pending-tag::before{animation:none!important}
+.hero-banner,.avatar-lg.avatar-fallback,.avatar-xl.avatar-fallback{background-size:100% 100%}
+.hero-banner .orb{opacity:.45}
+.avatar-ring::before{background:conic-gradient(from 0deg,#3b82f6,#8b5cf6,#06b6d4,#3b82f6)}
+.reporter-card::before{background-size:100% 100%}
+.sidebar .admin-user a.user-chip::after{border-color:var(--sidebar-bg)}
+.pstat-label{color:var(--text-muted)}
+:root[data-theme="dark"] .hero-banner{filter:brightness(.82) saturate(.9)}
+:root[data-theme="dark"] .profile-chip{background:var(--primary-tint);color:var(--primary-700)}
+:root[data-theme="dark"] .avatar{border-color:var(--surface)}

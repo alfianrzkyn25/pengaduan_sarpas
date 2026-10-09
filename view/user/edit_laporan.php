@@ -97,81 +97,7 @@ mysqli_stmt_close($st);
   <title>Edit Laporan #<?= (int)$a['id_aspirasi'] ?></title>
   <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
   <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
-  <style>
-    .alert.error {
-      background: #fef2f2;
-      border-left: 4px solid #dc2626;
-      color: #b91c1c;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      font-size: 14px;
-    }
-
-    .lampiran-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .lampiran-item {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f8fafc;
-      border: 1px solid #e7eaf2;
-      border-radius: 10px;
-      padding: 7px 12px;
-      font-size: 13px;
-      transition: background .15s ease;
-    }
-
-    .lampiran-item:hover {
-      background: #f1f4f9;
-    }
-
-    .lampiran-item a {
-      color: #2563eb;
-      text-decoration: none;
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .lampiran-item a:hover {
-      text-decoration: underline;
-    }
-
-    .btn-hapus-foto {
-      background: none;
-      border: none;
-      color: #dc2626;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      padding: 0 2px;
-      flex-shrink: 0;
-      transition: transform .15s ease;
-    }
-
-    .btn-hapus-foto:hover {
-      color: #991b1b;
-      transform: scale(1.15);
-    }
-
-    .info-note {
-      background: #eff6ff;
-      border-left: 4px solid #2563eb;
-      color: #1e40af;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-  </style>
+  <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -252,7 +178,7 @@ mysqli_stmt_close($st);
 
           <label>Tambah Foto Baru (opsional)
             <input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp">
-            <small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small>
+            <small class="form-help">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small>
           </label>
 
           <div>

@@ -162,6 +162,7 @@ if ($a && $a['status'] !== 'Ditolak') {
     <title>Detail Aspirasi</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body><input type="checkbox" id="menuToggle" class="menu-toggle">
@@ -200,7 +201,7 @@ if ($a && $a['status'] !== 'Ditolak') {
                             </div><?php endif; ?>
                     </section>
                     <section class="panel">
-                        <h2>Perbarui Status</h2><?php if ($a['status'] === 'Ditolak'): ?><p class="muted">Aspirasi ini sudah ditolak. Status terkunci dan tidak bisa diubah lagi.</p><?php else: ?><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status <span style="color:#6b7280;font-weight:400">(urut: Menunggu → Proses → Selesai)</span><select name="status" id="statusSelect"><?php foreach ($opsiStatus as $opt): ?><option value="<?= $opt ?>" <?= $a['status'] === $opt ? 'selected' : '' ?>><?= $opt ?></option><?php endforeach; ?></select></label><label>Feedback <span style="color:#6b7280;font-weight:400">(opsional)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?= e($a['feedback'] ?? '') ?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form><?php endif; ?>
+                        <h2>Perbarui Status</h2><?php if ($a['status'] === 'Ditolak'): ?><p class="muted">Aspirasi ini sudah ditolak. Status terkunci dan tidak bisa diubah lagi.</p><?php else: ?><form method="post" class="admin-form" enctype="multipart/form-data"><label>Status <span class="muted-inline">(urut: Menunggu → Proses → Selesai)</span><select name="status" id="statusSelect"><?php foreach ($opsiStatus as $opt): ?><option value="<?= $opt ?>" <?= $a['status'] === $opt ? 'selected' : '' ?>><?= $opt ?></option><?php endforeach; ?></select></label><label>Feedback <span class="muted-inline">(opsional)</span><textarea name="feedback" id="feedbackInput" maxlength="255" placeholder="Contoh: Laporan ditolak karena sudah pernah dilaporkan / bukan aset sekolah / data kurang jelas."><?= e($a['feedback'] ?? '') ?></textarea></label><label>Catatan Histori<textarea name="catatan" maxlength="255" placeholder="Catatan perubahan..."></textarea></label><label>Foto Bukti Perbaikan (opsional)<input type="file" name="foto_feedback" accept="image/jpeg,image/png,image/gif,image/webp"><small class="form-help">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label><button class="btn" type="submit">Simpan Perubahan</button></form><?php endif; ?>
                     </section>
                 </div>
                 <section class="panel">

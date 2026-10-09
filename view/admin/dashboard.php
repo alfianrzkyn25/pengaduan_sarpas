@@ -19,6 +19,7 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Dashboard Utama</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -42,13 +43,35 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
             <h1>Dashboard Utama</h1>
         </header>
         <main class="content-area">
-            <div class="grid">
-                <div class="card stat"><span>Total Pengaduan</span><strong><?= $stats['total'] ?></strong></div>
-                <div class="card stat"><span>Menunggu</span><strong><?= $stats['menunggu'] ?></strong></div>
-                <div class="card stat"><span>Proses</span><strong><?= $stats['proses'] ?></strong></div>
-                <div class="card stat"><span>Selesai</span><strong><?= $stats['selesai'] ?></strong></div>
-                <div class="card stat"><span>Ditolak</span><strong><?= $stats['ditolak'] ?></strong></div>
+            <div class="heading">
+                <div>
+                    <h1>Pengaduan sarana &amp; prasarana</h1>
+                    <p class="muted" data-today>Pantau status laporan yang masuk.</p>
+                </div>
+                <a class="btn" href="<?= e(url('admin/aspirasi')) ?>">Kelola aspirasi</a>
             </div>
+            <div class="grid">
+                <div class="card stat stat-total"><span>Total Pengaduan</span><strong data-count="<?= $stats['total'] ?>"><?= $stats['total'] ?></strong></div>
+                <div class="card stat stat-menunggu"><span>Menunggu</span><strong data-count="<?= $stats['menunggu'] ?>"><?= $stats['menunggu'] ?></strong></div>
+                <div class="card stat stat-proses"><span>Proses</span><strong data-count="<?= $stats['proses'] ?>"><?= $stats['proses'] ?></strong></div>
+                <div class="card stat stat-selesai"><span>Selesai</span><strong data-count="<?= $stats['selesai'] ?>"><?= $stats['selesai'] ?></strong></div>
+                <div class="card stat stat-ditolak"><span>Ditolak</span><strong data-count="<?= $stats['ditolak'] ?>"><?= $stats['ditolak'] ?></strong></div>
+            </div>
+            <section class="panel" data-status-chart>
+                <div class="panel-head">
+                    <h2>Komposisi status</h2>
+                </div>
+                <div class="chart-body">
+                    <div class="donut" data-donut></div>
+                    <ul class="legend">
+                        <li data-key="menunggu" data-value="<?= $stats['menunggu'] ?>"><span class="dot"></span><span class="name">Menunggu</span><span class="num"><?= $stats['menunggu'] ?></span><span class="pct"></span></li>
+                        <li data-key="proses" data-value="<?= $stats['proses'] ?>"><span class="dot"></span><span class="name">Proses</span><span class="num"><?= $stats['proses'] ?></span><span class="pct"></span></li>
+                        <li data-key="selesai" data-value="<?= $stats['selesai'] ?>"><span class="dot"></span><span class="name">Selesai</span><span class="num"><?= $stats['selesai'] ?></span><span class="pct"></span></li>
+                        <li data-key="ditolak" data-value="<?= $stats['ditolak'] ?>"><span class="dot"></span><span class="name">Ditolak</span><span class="num"><?= $stats['ditolak'] ?></span><span class="pct"></span></li>
+                    </ul>
+                </div>
+                <p class="chart-note" data-completion></p>
+            </section>
             <section class="panel">
                 <div class="panel-head">
                     <h2>5 Aspirasi Terbaru</h2><a href="<?= e(url('admin/aspirasi')) ?>">Kelola semua</a>
@@ -74,7 +97,7 @@ $r = mysqli_query($conn, "SELECT a.id_aspirasi,a.nis,s.nama,k.nama_kategori,a.lo
                                 <td><?= e($a['keterangan']) ?></td>
                                 <td><span class="badge <?= strtolower($a['status']) ?>"><?= e($a['status']) ?></span></td>
                                 <td><?= e(date('d-m-Y H:i', strtotime($a['tanggal']))) ?></td>
-                                <td><a class="btn" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
+                                <td><a class="btn small" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $a['id_aspirasi'] ?>">Beri Feedback</a></td>
                             </tr>
                         <?php endwhile; ?>
                     </table>

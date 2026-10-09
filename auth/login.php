@@ -50,6 +50,7 @@ $justRegistered = !empty($_GET['registered']);
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Login - Pengaduan Sarpras</title>
   <link rel="stylesheet" href="<?= e($base) ?>/assets/auth.css">
+  <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>

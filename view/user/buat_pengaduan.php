@@ -77,6 +77,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
     <title>Buat Pengaduan</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -122,7 +123,7 @@ $cats = mysqli_query($conn, 'SELECT id_kategori,nama_kategori,ket_kategori FROM 
                         </select></label>
                     <label>Lokasi<input name="lokasi" maxlength="50" required placeholder="Contoh: Ruang XII RPL 1"></label>
                     <label>Keterangan<textarea name="keterangan" maxlength="255" required placeholder="Jelaskan kerusakan atau masalah..."></textarea></label>
-                    <label>Foto Lampiran (opsional)<input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"><small style="color:#6b7280;display:block;margin-top:4px">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label>
+                    <label>Foto Lampiran (opsional)<input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"><small class="form-help">Format JPG/PNG/GIF/WEBP, maksimal 5MB.</small></label>
                     <div><button class="btn" type="submit">Kirim Pengaduan</button> <a class="btn secondary" href="<?= e(url('user/dashboard')) ?>">Batal</a></div>
                 </form>
             </section>

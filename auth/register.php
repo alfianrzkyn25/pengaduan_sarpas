@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Daftar Akun Siswa - Pengaduan Sarpras</title>
 <link rel="stylesheet" href="<?= e($base) ?>/assets/auth.css">
+<script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 <body>
 <main class="auth-wrap">
@@ -163,9 +164,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn-primary">Daftar Sekarang</button>
       </form>
 
-      <div class="role-hint">
-        <b>Khusus untuk Siswa.</b> Akun Admin dibuat langsung oleh pengelola sistem dan tidak bisa didaftarkan lewat halaman ini.
-      </div>
     </div>
 
   </section>

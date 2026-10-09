@@ -18,128 +18,7 @@ $r = mysqli_query($conn, "SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Histori Laporan</title>
   <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
-  <style>
-    .btn-hapus {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 12px;
-      font-size: 12px;
-      background: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background .15s ease, transform .15s ease;
-    }
-
-    .btn-hapus:hover {
-      background: #fecaca;
-      transform: translateY(-1px);
-    }
-
-    .alert-success {
-      background: #f0fdf4;
-      border-left: 4px solid #16a34a;
-      color: #166534;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      font-size: 14px;
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .5);
-      backdrop-filter: blur(2px);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-box {
-      background: #fff;
-      border-radius: 18px;
-      padding: 30px 32px;
-      max-width: 380px;
-      width: 90%;
-      box-shadow: 0 24px 48px -12px rgba(15, 23, 42, .35);
-      text-align: center;
-      animation: modalIn .22s cubic-bezier(.4, 0, .2, 1);
-    }
-
-    @keyframes modalIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px) scale(.97)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1)
-      }
-    }
-
-    .modal-box h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      color: #111827;
-      font-weight: 800;
-    }
-
-    .modal-box p {
-      margin: 0 0 20px;
-      font-size: 14px;
-      color: #667085;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .modal-actions .btn-batal {
-      padding: 9px 20px;
-      border: 1.5px solid #e2e6ee;
-      border-radius: 10px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-      transition: background .15s ease;
-    }
-
-    .modal-actions .btn-batal:hover {
-      background: #f8fafc;
-    }
-
-    .modal-actions .btn-konfirm {
-      padding: 9px 20px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 8px 18px -8px rgba(220, 38, 38, .5);
-      transition: transform .15s ease, filter .15s ease;
-    }
-
-    .modal-actions .btn-konfirm:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-  </style>
+  <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body>
@@ -169,10 +48,10 @@ $r = mysqli_query($conn, "SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh
       <?php endif; ?>
 
       <div class="grid">
-        <div class="card stat"><span>Menunggu</span><strong><?= $stats['menunggu'] ?></strong></div>
-        <div class="card stat"><span>Proses</span><strong><?= $stats['proses'] ?></strong></div>
-        <div class="card stat"><span>Selesai</span><strong><?= $stats['selesai'] ?></strong></div>
-        <div class="card stat"><span>Ditolak</span><strong><?= $stats['ditolak'] ?></strong></div>
+        <div class="card stat stat-menunggu"><span>Menunggu</span><strong data-count="<?= $stats['menunggu'] ?>"><?= $stats['menunggu'] ?></strong></div>
+        <div class="card stat stat-proses"><span>Proses</span><strong data-count="<?= $stats['proses'] ?>"><?= $stats['proses'] ?></strong></div>
+        <div class="card stat stat-selesai"><span>Selesai</span><strong data-count="<?= $stats['selesai'] ?>"><?= $stats['selesai'] ?></strong></div>
+        <div class="card stat stat-ditolak"><span>Ditolak</span><strong data-count="<?= $stats['ditolak'] ?>"><?= $stats['ditolak'] ?></strong></div>
       </div>
       <section class="panel">
         <h2 style="margin-top:0">Riwayat Perubahan Status</h2>
@@ -191,7 +70,7 @@ $r = mysqli_query($conn, "SELECT h.*,s.nama,s.nis,COALESCE(ad.nama,h.diubah_oleh
             <?php while ($h = mysqli_fetch_assoc($r)): ?>
               <tr>
                 <td><?= $h['id_histori'] ?></td>
-                <td><a class="btn secondary" style="padding:4px 8px" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $h['id_aspirasi'] ?>">#<?= $h['id_aspirasi'] ?></a></td>
+                <td><a class="btn secondary small" href="<?= e(url('admin/detail_aspirasi')) ?>?id=<?= $h['id_aspirasi'] ?>">#<?= $h['id_aspirasi'] ?></a></td>
                 <td><?= e($h['status_lama'] ?: '-') ?></td>
                 <td><span class="badge <?= strtolower($h['status_baru']) ?>"><?= e($h['status_baru']) ?></span></td>
                 <td><?= e($h['catatan'] ?: '-') ?></td>

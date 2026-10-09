@@ -188,6 +188,7 @@ $selesaiPct = $totalLaporan ? (int)round($ringkasan['Selesai'] / $totalLaporan *
     <title>Profil Saya</title>
     <link rel="stylesheet" href="<?= e($base) ?>/assets/admin.css">
     <link rel="stylesheet" href="<?= e($base) ?>/assets/profil.css">
+    <script src="<?= e($base) ?>/assets/ui.js"></script>
 </head>
 
 <body class="profile-page">

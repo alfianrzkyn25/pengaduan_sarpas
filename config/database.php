@@ -1,10 +1,10 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$server = 'localhost';
-$username = 'root';
-$pass = '';
-$database = 'pengaduan_sarpas';
+$server = 'sql211.infinityfree.com';
+$username = 'if0_43078283';
+$pass = 'cRMeygqIWD1';
+$database = 'if0_43078283_pengaduan_sarpas';
 
 $conn = mysqli_connect($server, $username, $pass, $database);
 if (!$conn) die('Koneksi database gagal: ' . mysqli_connect_error());
